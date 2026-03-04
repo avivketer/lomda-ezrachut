@@ -400,6 +400,7 @@
       <button class="exam" onclick="startExam()">🏆 מבחן שלב 1</button>
       <button class="primary" onclick="startAll(true)">תרגול בחירה (מעורבב)</button>
       <button class="mistakes-btn" onclick="startMistakes()">חזרה על טעויות</button>
+      <button style="background:#22c55e !important;color:#fff;" onclick="startSuccesses()">חזרה על הצלחות</button>
       <button class="warn" onclick="resetAll()">איפוס התקדמות</button>
     </div>
 
@@ -608,6 +609,20 @@
       list = shuffleArray(arr);
       idx = 0; correct = 0; wrong = 0;
       setModeLabel("\u05d7\u05d6\u05e8\u05ea \u05d8\u05e2\u05d5\u05d9\u05d5\u05ea");
+      initCounters();
+      render();
+    }
+
+    function startSuccesses() {
+      isStage2 = false; updateStage2UnlockUI();
+      document.getElementById("openQuestionArea").style.display = "none";
+      document.getElementById("answersArea").style.display = "block";
+      mode = "successes"; shuffled = true;
+      var arr = QUESTIONS.filter(function (q) { return successes.has(q.id); });
+      if (!arr.length) { alert("\u05e2\u05d3\u05d9\u05d9\u05df \u05d0\u05d9\u05df \u05d4\u05e6\u05dc\u05d7\u05d5\u05ea \u05e9\u05de\u05d5\u05e8\u05d5\u05ea."); return; }
+      list = shuffleArray(arr);
+      idx = 0; correct = 0; wrong = 0;
+      setModeLabel("\u05d7\u05d6\u05e8\u05ea \u05d4\u05e6\u05dc\u05d7\u05d5\u05ea");
       initCounters();
       render();
     }
