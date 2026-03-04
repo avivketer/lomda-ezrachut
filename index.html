@@ -319,6 +319,7 @@
       <button class="icon-btn" onclick="toggleMute()" id="muteBtn" title="השתקת סאונד">🔊</button>
       <button class="icon-btn" onclick="openModal('glossaryModal')" title="מילון מושגים">📖 מילון</button>
       <button class="icon-btn" onclick="openStats()" title="סטטיסטיקה">📊 סטטיסטיקה</button>
+      <button class="icon-btn" id="stage2Btn" onclick="devSkip()" title="שלב 2" style="display:none;">📝 שלב 2</button>
     </div>
 
     <div class="topbar">
@@ -337,12 +338,6 @@
       <button class="primary" onclick="startAll(true)">תרגול בחירה (מעורבב)</button>
       <button onclick="startMistakes()">חזרה על טעויות</button>
       <button class="exam" onclick="startExam()">🏆 מבחן שלב 1 (70 שאלות)</button>
-      <button id="stage2Btn"
-        style="background:#f59e0b; color:#fff; flex:1 1 100%; display:none; padding:14px; font-size:16px;"
-        onclick="startStage2()">📝 שלב 2 (שאלות פתוחות)</button>
-      <button id="devSkipBtn"
-        style="background:transparent; color:#64748b; font-size:14px; text-decoration:underline; border:none; box-shadow:none; flex: 1 1 100%; cursor:pointer;"
-        onclick="devSkip()">לצורכי פיתוח: דילוג לשלב 2</button>
       <button class="warn" onclick="resetAll()">איפוס התקדמות</button>
     </div>
 
@@ -476,11 +471,9 @@
     function updateStage2UnlockUI() {
       var stage2Btn = document.getElementById("stage2Btn");
       var stageLabel = document.getElementById("stageLabel");
-      if (civics_stats.examsPassed >= 3) {
-        stage2Btn.style.display = "block";
-        if (isStage2) stageLabel.style.display = "inline-block";
-        else stageLabel.style.display = "none";
-      }
+      stage2Btn.style.display = "inline-flex";
+      if (isStage2) stageLabel.style.display = "inline-block";
+      else stageLabel.style.display = "none";
     }
 
     function beep(f, t, vol) {
