@@ -398,7 +398,8 @@
 
     <div class="controls">
       <button class="exam" onclick="startExam()">🏆 מבחן שלב 1</button>
-      <button class="primary" onclick="startAll(true)">תרגול בחירה (מעורבב)</button>
+      <button class="primary" onclick="startAll(true)">תרגול אקראי</button>
+      <button class="primary" onclick="startAll(false)" style="background:#6366f1 !important;">תרגול לפי סדר</button>
       <button class="mistakes-btn" onclick="startMistakes()">חזרה על טעויות</button>
       <button style="background:#22c55e !important;color:#fff;" onclick="startSuccesses()">חזרה על הצלחות</button>
       <button class="warn" onclick="resetAll()">איפוס התקדמות</button>
@@ -582,19 +583,28 @@
     function setModeLabel(txt) { document.getElementById("modeLabel").textContent = txt; }
     function topicChanged() { startAll(true); }
 
+    function getTopicLabel() {
+      var topic = document.getElementById("topicFilter").value;
+      if (topic === "all") return "";
+      var opt = document.getElementById("topicFilter").selectedOptions[0];
+      return " (" + opt.textContent.split(":")[0].trim() + ")";
+    }
+
+    function getFilteredBase() {
+      var topic = document.getElementById("topicFilter").value;
+      if (topic === "all") return QUESTIONS;
+      return QUESTIONS.filter(function (q) { return q.topicId == topic; });
+    }
+
     function startAll(doShuffle) {
       isStage2 = false; updateStage2UnlockUI();
       document.getElementById("openQuestionArea").style.display = "none";
       document.getElementById("answersArea").style.display = "block";
       mode = "all"; shuffled = doShuffle;
-      var topic = document.getElementById("topicFilter").value;
-      var baseQuestions = QUESTIONS;
-      if (topic !== "all") {
-        baseQuestions = QUESTIONS.filter(function (q) { return q.topicId == topic; });
-      }
+      var baseQuestions = getFilteredBase();
       list = doShuffle ? shuffleArray(baseQuestions) : baseQuestions.slice();
       idx = 0; correct = 0; wrong = 0;
-      setModeLabel(doShuffle ? "\u05ea\u05e8\u05d2\u05d5\u05dc (\u05de\u05e2\u05d5\u05e8\u05d1\u05d1)" : "\u05ea\u05e8\u05d2\u05d5\u05dc (\u05e1\u05d3\u05e8 \u05e7\u05d1\u05d5\u05e2)");
+      setModeLabel((doShuffle ? "\u05ea\u05e8\u05d2\u05d5\u05dc \u05d0\u05e7\u05e8\u05d0\u05d9" : "\u05ea\u05e8\u05d2\u05d5\u05dc \u05dc\u05e4\u05d9 \u05e1\u05d3\u05e8") + getTopicLabel());
       initCounters();
       render();
     }
@@ -604,11 +614,12 @@
       document.getElementById("openQuestionArea").style.display = "none";
       document.getElementById("answersArea").style.display = "block";
       mode = "mistakes"; shuffled = true;
-      var arr = QUESTIONS.filter(function (q) { return mistakes.has(q.id); });
-      if (!arr.length) { alert("\u05db\u05dc \u05d4\u05db\u05d1\u05d5\u05d3! \u05d0\u05d9\u05df \u05d8\u05e2\u05d5\u05d9\u05d5\u05ea \u05e9\u05de\u05d5\u05e8\u05d5\u05ea."); return; }
+      var base = getFilteredBase();
+      var arr = base.filter(function (q) { return mistakes.has(q.id); });
+      if (!arr.length) { alert("\u05d0\u05d9\u05df \u05d8\u05e2\u05d5\u05d9\u05d5\u05ea \u05e9\u05de\u05d5\u05e8\u05d5\u05ea" + (getTopicLabel() ? " \u05d1\u05e0\u05d5\u05e9\u05d0 \u05d6\u05d4" : "") + "."); return; }
       list = shuffleArray(arr);
       idx = 0; correct = 0; wrong = 0;
-      setModeLabel("\u05d7\u05d6\u05e8\u05ea \u05d8\u05e2\u05d5\u05d9\u05d5\u05ea");
+      setModeLabel("\u05d7\u05d6\u05e8\u05ea \u05d8\u05e2\u05d5\u05d9\u05d5\u05ea" + getTopicLabel());
       initCounters();
       render();
     }
@@ -618,11 +629,12 @@
       document.getElementById("openQuestionArea").style.display = "none";
       document.getElementById("answersArea").style.display = "block";
       mode = "successes"; shuffled = true;
-      var arr = QUESTIONS.filter(function (q) { return successes.has(q.id); });
-      if (!arr.length) { alert("\u05e2\u05d3\u05d9\u05d9\u05df \u05d0\u05d9\u05df \u05d4\u05e6\u05dc\u05d7\u05d5\u05ea \u05e9\u05de\u05d5\u05e8\u05d5\u05ea."); return; }
+      var base = getFilteredBase();
+      var arr = base.filter(function (q) { return successes.has(q.id); });
+      if (!arr.length) { alert("\u05d0\u05d9\u05df \u05d4\u05e6\u05dc\u05d7\u05d5\u05ea \u05e9\u05de\u05d5\u05e8\u05d5\u05ea" + (getTopicLabel() ? " \u05d1\u05e0\u05d5\u05e9\u05d0 \u05d6\u05d4" : "") + "."); return; }
       list = shuffleArray(arr);
       idx = 0; correct = 0; wrong = 0;
-      setModeLabel("\u05d7\u05d6\u05e8\u05ea \u05d4\u05e6\u05dc\u05d7\u05d5\u05ea");
+      setModeLabel("\u05d7\u05d6\u05e8\u05ea \u05d4\u05e6\u05dc\u05d7\u05d5\u05ea" + getTopicLabel());
       initCounters();
       render();
     }
