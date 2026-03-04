@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - בדיקת שאלות</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Arial;
+            background: #f1f5f9;
+            margin: 0;
+            padding: 16px;
+            direction: rtl;
+        }
+
+        .top-bar {
+            max-width: 900px;
+            margin: 0 auto 16px;
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .top-bar h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .stats {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .filter-bar {
+            max-width: 900px;
+            margin: 0 auto 16px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar select,
+        .filter-bar input {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .filter-bar select {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-bar input {
+            flex: 2;
+            min-width: 200px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-green {
+            background: #16a34a;
+            color: #fff;
+        }
+
+        .btn-green:hover {
+            background: #15803d;
+        }
+
+        .btn-blue {
+            background: #4f46e5;
+            color: #fff;
+        }
+
+        .btn-blue:hover {
+            background: #4338ca;
+        }
+
+        .q-card {
+            max-width: 900px;
+            margin: 0 auto 12px;
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+            border-right: 4px solid #e5e7eb;
+            transition: .2s;
+        }
+
+        .q-card.has-error {
+            border-right-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .q-card.confirmed {
+            border-right-color: #16a34a;
+            background: #f0fdf4;
+        }
+
+        .q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .q-id {
+            background: #eef2ff;
+            color: #4f46e5;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .q-topic {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .q-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .ans {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            cursor: pointer;
+            transition: .15s;
+            font-size: 15px;
+        }
+
+        .ans:hover {
+            border-color: #cbd5e1;
+            background: #f8fafc;
+        }
+
+        .ans.is-correct {
+            border-color: #16a34a;
+            background: #dcfce7;
+            font-weight: 600;
+        }
+
+        .ans .idx {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            background: #f1f5f9;
+            color: #64748b;
+            flex-shrink: 0;
+        }
+
+        .ans.is-correct .idx {
+            background: #16a34a;
+            color: #fff;
+        }
+
+        .q-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            align-items: center;
+        }
+
+        .q-actions button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: inherit;
+        }
+
+        .confirm-btn {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .confirm-btn:hover {
+            background: #bbf7d0;
+        }
+
+        .flag-btn {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .flag-btn:hover {
+            background: #fecaca;
+        }
+
+        .export-box {
+            max-width: 900px;
+            margin: 20px auto;
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+            display: none;
+        }
+
+        .export-box textarea {
+            width: 100%;
+            height: 200px;
+            font-family: monospace;
+            font-size: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .change-count {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="top-bar">
+        <h1>🔧 בדיקת שאלות - Admin</h1>
+        <div class="stats">
+            <span>סה"כ: <b id="totalCount">0</b></span> ·
+            <span>אושרו: <b id="confirmedCount" style="color:#16a34a">0</b></span> ·
+            <span>שגויות: <b id="flaggedCount" style="color:#ef4444">0</b></span> ·
+            <span>שינויים: <b id="changesCount" style="color:#d97706">0</b></span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-green" onclick="exportFixed()">💾 ייצוא questions.js מתוקן</button>
+            <button class="btn btn-blue" onclick="copyToClipboard()">📋 העתק ללוח</button>
+        </div>
+    </div>
+
+    <div class="filter-bar">
+        <select id="topicFilter" onchange="renderAll()">
+            <option value="all">כל הנושאים</option>
+            <option value="1">נושא 1: עקרונות יסוד</option>
+            <option value="2">נושא 2: זכויות אדם ואזרח</option>
+            <option value="3">נושא 3: מוסדות השלטון</option>
+            <option value="4">נושא 4: לאומיות ומיעוטים</option>
+        </select>
+        <select id="statusFilter" onchange="renderAll()">
+            <option value="all">כל הסטטוסים</option>
+            <option value="changed">שונו</option>
+            <option value="flagged">סומנו כשגויות</option>
+            <option value="confirmed">אושרו</option>
+            <option value="unchecked">לא נבדקו</option>
+        </select>
+        <input id="searchBox" type="text" placeholder="חיפוש בטקסט השאלה..." oninput="renderAll()" />
+    </div>
+
+    <div id="cardsContainer"></div>
+
+    <div class="export-box" id="exportBox">
+        <h3>קובץ questions.js מתוקן:</h3>
+        <textarea id="exportText" readonly></textarea>
+        <div style="margin-top:8px;">
+            <button class="btn btn-blue" onclick="copyToClipboard()">📋 העתק ללוח</button>
+        </div>
+    </div>
+
+    <script src="questions.js"></script>
+    <script>
+        // Deep copy original for comparison
+        var originalData = JSON.parse(JSON.stringify(QUESTIONS));
+        var editedData = JSON.parse(JSON.stringify(QUESTIONS));
+        var statuses = {}; // id -> "confirmed" | "flagged" | "unchecked"
+
+        // Load saved state
+        try {
+            var saved = JSON.parse(localStorage.getItem("admin_edits") || "null");
+            if (saved) {
+                editedData = saved.data || editedData;
+                statuses = saved.statuses || {};
+            }
+        } catch (e) { }
+
+        function save() {
+            localStorage.setItem("admin_edits", JSON.stringify({ data: editedData, statuses: statuses }));
+            updateCounters();
+        }
+
+        function updateCounters() {
+            document.getElementById("totalCount").textContent = editedData.length;
+            var conf = 0, flag = 0, changes = 0;
+            editedData.forEach(function (q, i) {
+                var s = statuses[q.id] || "unchecked";
+                if (s === "confirmed") conf++;
+                if (s === "flagged") flag++;
+                if (q.correctIndex !== originalData[i].correctIndex) changes++;
+            });
+            document.getElementById("confirmedCount").textContent = conf;
+            document.getElementById("flaggedCount").textContent = flag;
+            document.getElementById("changesCount").textContent = changes;
+        }
+
+        function changeCorrect(qIdx, ansIdx) {
+            editedData[qIdx].correctIndex = ansIdx;
+            save();
+            renderAll();
+        }
+
+        function setStatus(qId, status) {
+            statuses[qId] = status;
+            save();
+            renderAll();
+        }
+
+        function renderAll() {
+            var topic = document.getElementById("topicFilter").value;
+            var statusF = document.getElementById("statusFilter").value;
+            var search = document.getElementById("searchBox").value.toLowerCase();
+            var container = document.getElementById("cardsContainer");
+            container.innerHTML = "";
+
+            editedData.forEach(function (q, i) {
+                // Filters
+                if (topic !== "all" && q.topicId != topic) return;
+                var s = statuses[q.id] || "unchecked";
+                if (statusF !== "all" && statusF !== s) {
+                    if (statusF === "changed" && q.correctIndex === originalData[i].correctIndex) return;
+                    if (statusF !== "changed") return;
+                }
+                if (search && q.question.toLowerCase().indexOf(search) === -1) return;
+
+                var changed = q.correctIndex !== originalData[i].correctIndex;
+                var cardClass = "q-card";
+                if (s === "flagged") cardClass += " has-error";
+                if (s === "confirmed") cardClass += " confirmed";
+
+                var html = '<div class="' + cardClass + '" id="q' + q.id + '">';
+                html += '<div class="q-header"><div class="q-id">#' + q.id + (changed ? ' <span class="change-count">שונה</span>' : '') + '</div></div>';
+                html += '<div class="q-topic">' + q.topic + ' · ' + q.subtopic + ' · רמה ' + q.difficulty + '</div>';
+                html += '<div class="q-text">' + q.question + '</div>';
+                html += '<div class="answers">';
+
+                q.answers.forEach(function (ans, ai) {
+                    var isC = ai === q.correctIndex;
+                    var wasC = ai === originalData[i].correctIndex;
+                    html += '<div class="ans' + (isC ? ' is-correct' : '') + '" onclick="changeCorrect(' + i + ',' + ai + ')">';
+                    html += '<div class="idx">' + (ai + 1) + '</div>';
+                    html += '<div>' + ans;
+                    if (changed && wasC && !isC) html += ' <span style="color:#ef4444;font-size:12px;">(היה נכון)</span>';
+                    html += '</div></div>';
+                });
+
+                html += '</div>';
+                html += '<div class="q-actions">';
+                html += '<button class="confirm-btn" onclick="setStatus(' + q.id + ',\'confirmed\')">✓ אישור</button>';
+                html += '<button class="flag-btn" onclick="setStatus(' + q.id + ',\'flagged\')">⚠ סימון שגוי</button>';
+                if (changed) {
+                    html += '<button style="background:#fef3c7;color:#92400e;" onclick="changeCorrect(' + i + ',' + originalData[i].correctIndex + ')">↩ שחזור מקורי</button>';
+                }
+                html += '<span style="font-size:12px;color:#94a3b8;margin-right:auto;">' + s + '</span>';
+                html += '</div></div>';
+
+                container.innerHTML += html;
+            });
+        }
+
+        function exportFixed() {
+            var js = "const QUESTIONS = " + JSON.stringify(editedData, null, 2) + ";\n";
+            document.getElementById("exportText").value = js;
+            document.getElementById("exportBox").style.display = "block";
+            document.getElementById("exportBox").scrollIntoView({ behavior: "smooth" });
+        }
+
+        function copyToClipboard() {
+            var js = "const QUESTIONS = " + JSON.stringify(editedData) + ";\n";
+            navigator.clipboard.writeText(js).then(function () {
+                alert("הועתק ללוח! הדבק בקובץ questions.js");
+            });
+        }
+
+        updateCounters();
+        renderAll();
+    </script>
+</body>
+
+</html>

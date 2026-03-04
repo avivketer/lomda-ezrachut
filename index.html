@@ -166,7 +166,8 @@
       gap: 10px;
       flex-wrap: wrap;
       margin-top: 16px;
-      align-items: center;
+      margin-bottom: 16px;
+      align-items: stretch;
     }
 
     .controls button {
@@ -175,6 +176,9 @@
       border: none;
       border-radius: 12px;
       background: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
@@ -198,6 +202,64 @@
     .warn {
       background: #fca5a5 !important;
       color: #7f1d1d;
+    }
+
+    .mistakes-btn {
+      background: #f59e0b !important;
+      color: #fff;
+    }
+
+    .mistakes-btn:hover {
+      background: #d97706 !important;
+    }
+
+    .topic-subtitle {
+      text-align: center;
+      font-size: 14px;
+      color: #6366f1;
+      font-weight: 600;
+      margin-bottom: 6px;
+      background: #eef2ff;
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
+
+    .help-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .help-btn {
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+      flex-shrink: 0;
+    }
+
+    .help-btn:hover {
+      background: #c7d2fe;
+    }
+
+    .help-box {
+      display: none;
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      color: #3730a3;
+      line-height: 1.4;
+      margin-bottom: 8px;
     }
 
     .warn:hover {
@@ -323,11 +385,11 @@
     </div>
 
     <div class="topbar">
+      <div class="pill gray" id="modeLabel">הכול</div>
+      <div class="pill" id="stageLabel" style="background:#fcd34d; color:#92400e; display:none;">שלב 2 🔓</div>
       <div class="pill">נכון: <span id="correct">0</span></div>
       <div class="pill" style="background:#fee2e2;color:#991b1b;">שגוי: <span id="wrong">0</span></div>
       <div class="pill gray">שאלה <span id="qnum">1</span> / <span id="qtotal">0</span></div>
-      <div class="pill gray" id="modeLabel">הכול</div>
-      <div class="pill" id="stageLabel" style="background:#fcd34d; color:#92400e; display:none;">שלב 2 🔓</div>
     </div>
 
     <div class="progress">
@@ -335,14 +397,19 @@
     </div>
 
     <div class="controls">
+      <button class="exam" onclick="startExam()">🏆 מבחן שלב 1</button>
       <button class="primary" onclick="startAll(true)">תרגול בחירה (מעורבב)</button>
-      <button onclick="startMistakes()">חזרה על טעויות</button>
-      <button class="exam" onclick="startExam()">🏆 מבחן שלב 1 (70 שאלות)</button>
+      <button class="mistakes-btn" onclick="startMistakes()">חזרה על טעויות</button>
       <button class="warn" onclick="resetAll()">איפוס התקדמות</button>
     </div>
 
     <div id="questionArea">
-      <div id="questionText"></div>
+      <div class="topic-subtitle" id="topicSubtitle"></div>
+      <div class="help-row">
+        <button class="help-btn" id="helpBtn" onclick="toggleHelp()" title="רמז להבנת השאלה">💡</button>
+        <div id="questionText"></div>
+      </div>
+      <div class="help-box" id="helpBox"></div>
       <div id="answersArea"></div>
 
       <div id="openQuestionArea" style="display:none; margin-top:10px;">
@@ -370,8 +437,6 @@
           </div>
         </div>
       </div>
-
-      <div class="small" id="explainArea"></div>
     </div>
   </div>
 
@@ -493,6 +558,11 @@
       document.getElementById("muteBtn").textContent = muted ? "\uD83D\uDD07" : "\uD83D\uDD0A";
     }
 
+    function toggleHelp() {
+      var box = document.getElementById("helpBox");
+      box.style.display = box.style.display === "block" ? "none" : "block";
+    }
+
     function saveSets() {
       localStorage.setItem("civics_mistakes", JSON.stringify(Array.from(mistakes)));
       localStorage.setItem("civics_successes", JSON.stringify(Array.from(successes)));
@@ -599,7 +669,10 @@
       document.getElementById("qnum").textContent = (idx + 1);
       document.getElementById("progressBar").style.width = ((idx / list.length) * 100) + "%";
       document.getElementById("questionText").textContent = q.question;
-      document.getElementById("explainArea").textContent = "";
+      document.getElementById("topicSubtitle").textContent = q.topic || "";
+      document.getElementById("helpBox").style.display = "none";
+      document.getElementById("helpBox").textContent = q.explanation || "";
+      document.getElementById("helpBtn").style.display = q.explanation ? "flex" : "none";
 
       if (!isStage2) {
         var answersArea = document.getElementById("answersArea");
@@ -625,7 +698,8 @@
       var percent = Math.round((correct / Math.max(1, list.length)) * 100);
       document.getElementById("questionText").innerHTML = "\u05e1\u05d9\u05d5\u05dd \u05ea\u05e8\u05d2\u05d5\u05dc \uD83C\uDF89";
       document.getElementById("progressBar").style.width = "100%";
-      document.getElementById("explainArea").textContent = "";
+      document.getElementById("helpBox").style.display = "none";
+      document.getElementById("helpBtn").style.display = "none";
 
       if (mode === "exam") {
         if (percent >= 90) {
@@ -669,7 +743,6 @@
       saveSets();
       document.getElementById("correct").textContent = correct;
       document.getElementById("wrong").textContent = wrong;
-      if (q.explanation) document.getElementById("explainArea").textContent = "\u05d4\u05e1\u05d1\u05e8: " + q.explanation;
       setTimeout(function () { idx++; render(); }, 1200);
     }
 
