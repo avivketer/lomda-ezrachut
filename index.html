@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>לומדת אזרחות – 200 שאלות עם שלב 2</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Arial;
+      background: linear-gradient(135deg, #e0f2fe, #f8fafc);
+      margin: 0;
+      padding: 16px;
+      direction: rtl;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+    }
+
+    h1 {
+      text-align: center;
+      margin: 0 0 10px;
+    }
+
+    .options-bar {
+      background: #f1f5f9;
+      padding: 12px;
+      border-radius: 12px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .options-bar select {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .icon-btn {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon-btn:hover {
+      background: #e2e8f0;
+    }
+
+    .topbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #3730a3;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .pill.gray {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .progress {
+      height: 10px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 10px 0 14px;
+    }
+
+    .progress-inner {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #4f46e5, #22c55e);
+      transition: width 0.2s ease;
+    }
+
+    #questionText {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 6px 0 14px;
+      color: #111827;
+      line-height: 1.4;
+    }
+
+    .answer-btn {
+      width: 100%;
+      text-align: right;
+      padding: 12px 14px;
+      margin: 6px 0;
+      border-radius: 14px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      transition: 0.2s;
+      font-family: inherit;
+    }
+
+    .answer-btn:hover {
+      background: #eef2f7;
+      border-color: #cbd5e1;
+    }
+
+    .answer-btn.correct {
+      background: #dcfce7;
+      border-color: #16a34a;
+      font-weight: bold;
+      color: #166534;
+    }
+
+    .answer-btn.wrong {
+      background: #fee2e2;
+      border-color: #dc2626;
+      color: #991b1b;
+    }
+
+    .small {
+      font-size: 14px;
+      color: #4b5563;
+      margin-top: 10px;
+      line-height: 1.4;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+      align-items: center;
+    }
+
+    .controls button {
+      flex: 1 1 180px;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      background: #e5e7eb;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      font-family: inherit;
+    }
+
+    .controls button:hover {
+      background: #d1d5db;
+    }
+
+    .primary {
+      background: #4f46e5 !important;
+      color: #fff;
+    }
+
+    .primary:hover {
+      background: #4338ca !important;
+    }
+
+    .warn {
+      background: #fca5a5 !important;
+      color: #7f1d1d;
+    }
+
+    .warn:hover {
+      background: #f87171 !important;
+    }
+
+    .exam {
+      background: #16a34a !important;
+      color: white;
+    }
+
+    .exam:hover {
+      background: #15803d !important;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal {
+      background: #fff;
+      padding: 24px;
+      border-radius: 20px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      color: #1e293b;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 10px;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: #f1f5f9;
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      font-size: 18px;
+      cursor: pointer;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-modal:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+
+    .stat-val {
+      font-weight: bold;
+      color: #4f46e5;
+    }
+
+    .glossary-item {
+      margin-bottom: 16px;
+      border-right: 4px solid #4f46e5;
+      padding-right: 12px;
+      background: #f8fafc;
+      padding: 12px 12px 12px 16px;
+      border-radius: 8px;
+    }
+
+    .glossary-term {
+      font-weight: bold;
+      color: #0f172a;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>לומדת אזרחות</h1>
+
+    <div class="options-bar">
+      <select id="topicFilter" onchange="topicChanged()">
+        <option value="all">כל הנושאים (200 שאלות)</option>
+        <option value="1">נושא 1: עקרונות יסוד דמוקרטיה</option>
+        <option value="2">נושא 2: זכויות אדם ואזרח</option>
+        <option value="3">נושא 3: מוסדות השלטון</option>
+        <option value="4">נושא 4: לאומיות ומיעוטים</option>
+      </select>
+      <button class="icon-btn" onclick="toggleMute()" id="muteBtn" title="השתקת סאונד">🔊</button>
+      <button class="icon-btn" onclick="openModal('glossaryModal')" title="מילון מושגים">📖 מילון</button>
+      <button class="icon-btn" onclick="openStats()" title="סטטיסטיקה">📊 סטטיסטיקה</button>
+    </div>
+
+    <div class="topbar">
+      <div class="pill">נכון: <span id="correct">0</span></div>
+      <div class="pill" style="background:#fee2e2;color:#991b1b;">שגוי: <span id="wrong">0</span></div>
+      <div class="pill gray">שאלה <span id="qnum">1</span> / <span id="qtotal">0</span></div>
+      <div class="pill gray" id="modeLabel">הכול</div>
+      <div class="pill" id="stageLabel" style="background:#fcd34d; color:#92400e; display:none;">שלב 2 🔓</div>
+    </div>
+
+    <div class="progress">
+      <div class="progress-inner" id="progressBar"></div>
+    </div>
+
+    <div class="controls">
+      <button class="primary" onclick="startAll(true)">תרגול בחירה (מעורבב)</button>
+      <button onclick="startMistakes()">חזרה על טעויות</button>
+      <button class="exam" onclick="startExam()">🏆 מבחן שלב 1 (70 שאלות)</button>
+      <button id="stage2Btn"
+        style="background:#f59e0b; color:#fff; flex:1 1 100%; display:none; padding:14px; font-size:16px;"
+        onclick="startStage2()">📝 שלב 2 (שאלות פתוחות)</button>
+      <button id="devSkipBtn"
+        style="background:transparent; color:#64748b; font-size:14px; text-decoration:underline; border:none; box-shadow:none; flex: 1 1 100%; cursor:pointer;"
+        onclick="devSkip()">לצורכי פיתוח: דילוג לשלב 2</button>
+      <button class="warn" onclick="resetAll()">איפוס התקדמות</button>
+    </div>
+
+    <div id="questionArea">
+      <div id="questionText"></div>
+      <div id="answersArea"></div>
+
+      <div id="openQuestionArea" style="display:none; margin-top:10px;">
+        <textarea id="openAnswerInput" rows="5"
+          style="width:100%; border-radius:12px; padding:12px; font-size:16px; font-family:inherit; border:2px solid #cbd5e1; resize:vertical;"
+          placeholder="הקלד/י את תשובתך המלאה כאן..."></textarea>
+
+        <button id="showAnswerBtn" class="primary"
+          style="width:100%; padding:14px; margin-top:12px; border-radius:12px; font-size:16px; background:#4f46e5; color:#fff; border:none; cursor:pointer;"
+          onclick="showOpenAnswer()">הצג תשובה אידיאלית לבדיקה</button>
+
+        <div id="idealAnswerBox"
+          style="display:none; margin-top:16px; background:#dcfce7; padding:16px; border-radius:12px; border:1px solid #22c55e;">
+          <div style="font-weight:bold; color:#166534; margin-bottom:8px;">תשובה מעולה:</div>
+          <div id="idealAnswerText" style="white-space:pre-wrap; color:#14532d; font-size:15px; line-height:1.5;"></div>
+
+          <div style="margin-top:16px; text-align:center; font-weight:bold; color:#1e1b4b;">האם ענית נכון?</div>
+          <div style="display:flex; gap:10px; margin-top:8px;">
+            <button onclick="gradeOpenAnswer(true)"
+              style="flex:1; background:#22c55e; color:#fff; border:none; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:15px; transition:0.2s;">✓
+              עניתי קרוב מאוד</button>
+            <button onclick="gradeOpenAnswer(false)"
+              style="flex:1; background:#ef4444; color:#fff; border:none; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:15px; transition:0.2s;">✗
+              לא מספיק מדויק</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="small" id="explainArea"></div>
+    </div>
+  </div>
+
+  <!-- Glossary Modal -->
+  <div class="modal-overlay" id="glossaryModal">
+    <div class="modal">
+      <button class="close-modal" aria-label="סגור" onclick="closeModal('glossaryModal')">&times;</button>
+      <h2>מילון מושגים</h2>
+      <div id="glossaryContent">
+        <div class="glossary-item">
+          <div class="glossary-term">דמוקרטיה</div>שלטון העם. שיטה שבה האזרחים בוחרים את נציגיהם, וישנה שמירה על זכויות
+          אדם.
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">שלטון החוק</div>העיקרון לפיו כולם שווים בפני החוק.
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">זכויות אדם</div>זכויות בסיסיות המגיעות לכל אדם.
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">זכויות אזרח</div>זכויות הניתנות רק לאזרחי המדינה.
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">הפרדת רשויות</div>פיצול הכוח השלטוני כדי למנוע עריצות.
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">פלורליזם</div>הכרה בקיומן של דעות וקבוצות שונות.
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">מדינת לאום</div>מדינה שמזוהה עם לאום מסוים ומעניקה לו ביטוי חוקי.
+        </div>
+        <div class="glossary-item">
+          <div class="glossary-term">מיעוט</div>קבוצה באוכלוסייה שאינה הרוב, השונה מהרוב בדת סמלים או שייכות אתנית.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Modal -->
+  <div class="modal-overlay" id="statsModal">
+    <div class="modal">
+      <button class="close-modal" aria-label="סגור" onclick="closeModal('statsModal')">&times;</button>
+      <h2>סטטיסטיקת המשתמש</h2>
+      <div id="statsContent"></div>
+      <div style="margin-top: 20px; text-align:center;">
+        <button class="primary" style="padding: 10px 20px; border-radius: 8px; border: none; cursor:pointer;"
+          onclick="closeModal('statsModal')">סגור</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUESTIONS loaded from separate file to avoid encoding corruption -->
+  <script src="questions.js"></script>
+
+  <script>
+    // --- OPEN QUESTIONS (Stage 2) ---
+    const OPEN_QUESTIONS = [
+      {
+        question: "\u05d4\u05e6\u05d2 \u05d0\u05ea \u05d4\u05d6\u05db\u05d5\u05ea \u05dc\u05d7\u05d5\u05e4\u05e9 \u05d4\u05d1\u05d9\u05d8\u05d5\u05d9, \u05d5\u05d4\u05e1\u05d1\u05e8 \u05de\u05e7\u05e8\u05d4 \u05d0\u05d7\u05d3 \u05e9\u05d1\u05d5 \u05de\u05d5\u05e6\u05d3\u05e7 \u05dc\u05d4\u05d2\u05d1\u05d9\u05dc \u05d6\u05db\u05d5\u05ea \u05d6\u05d5.",
+        idealAnswer: "\u05d7\u05d5\u05e4\u05e9 \u05d4\u05d1\u05d9\u05d8\u05d5\u05d9 \u05d4\u05d5\u05d0 \u05d6\u05db\u05d5\u05ea\u05d5 \u05e9\u05dc \u05db\u05dc \u05d0\u05d3\u05dd \u05dc\u05d4\u05d1\u05d9\u05e2 \u05d0\u05ea \u05d3\u05e2\u05ea\u05d5, \u05d0\u05de\u05d5\u05e0\u05ea\u05d5 \u05d5\u05d4\u05e9\u05e7\u05e4\u05ea \u05e2\u05d5\u05dc\u05de\u05d5, \u05d1\u05db\u05dc \u05d3\u05e8\u05da (\u05d1\u05db\u05ea\u05d1, \u05d1\u05e2\u05dc \u05e4\u05d4, \u05d1\u05d0\u05de\u05e0\u05d5\u05ea \u05d5\u05db\u05d5') \u05d1\u05d0\u05d5\u05e4\u05df \u05e4\u05d5\u05de\u05d1\u05d9 \u05d5\u05d2\u05dc\u05d5\u05d9.\n\u05de\u05d5\u05e6\u05d3\u05e7 \u05dc\u05d4\u05d2\u05d1\u05d9\u05dc \u05d0\u05ea \u05d7\u05d5\u05e4\u05e9 \u05d4\u05d1\u05d9\u05d8\u05d5\u05d9 \u05db\u05d0\u05e9\u05e8 \u05e7\u05d9\u05d9\u05de\u05ea \u05d4\u05ea\u05e0\u05d2\u05e9\u05d5\u05ea \u05e2\u05dd \u05d6\u05db\u05d5\u05ea \u05d0\u05d7\u05e8\u05ea \u05d0\u05d5 \u05e2\u05dd \u05d0\u05d9\u05e0\u05d8\u05e8\u05e1 \u05e6\u05d9\u05d1\u05d5\u05e8\u05d9 - \u05dc\u05de\u05e9\u05dc \u05db\u05d0\u05e9\u05e8 \u05d4\u05d1\u05d9\u05d8\u05d5\u05d9 \u05de\u05d4\u05d5\u05d5\u05d4 \u05d4\u05e1\u05ea\u05d4 \u05dc\u05d0\u05dc\u05d9\u05de\u05d5\u05ea (\u05d4\u05ea\u05e0\u05d2\u05e9\u05d5\u05ea \u05e2\u05dd \u05d4\u05d6\u05db\u05d5\u05ea \u05dc\u05d7\u05d9\u05d9\u05dd \u05d5\u05d1\u05d9\u05d8\u05d7\u05d5\u05df) \u05d0\u05d5 \u05e9\u05d9\u05d9\u05de\u05d9\u05e0\u05d2 \u05d5\u05dc\u05e9\u05d5\u05df \u05d4\u05e8\u05e2 (\u05d4\u05ea\u05e0\u05d2\u05e9\u05d5\u05ea \u05e2\u05dd \u05d4\u05d6\u05db\u05d5\u05ea \u05dc\u05e9\u05dd \u05d8\u05d5\u05d1)."
+      },
+      {
+        question: "\u05d4\u05e1\u05d1\u05e8 \u05de\u05d4\u05d5 '\u05e2\u05e7\u05e8\u05d5\u05df \u05e9\u05dc\u05d8\u05d5\u05df \u05d4\u05d7\u05d5\u05e7', \u05d5\u05d4\u05e6\u05d2 \u05d0\u05ea \u05d4\u05d4\u05d1\u05d3\u05dc \u05d1\u05d9\u05df \u05e2\u05d1\u05e8\u05d9\u05d9\u05e0\u05d5\u05ea \u05e4\u05dc\u05d9\u05dc\u05d9\u05ea \u05e8\u05d2\u05d9\u05dc\u05d4 \u05dc\u05e2\u05d1\u05e8\u05d9\u05d9\u05e0\u05d5\u05ea \u05d0\u05d9\u05d3\u05d9\u05d0\u05d5\u05dc\u05d5\u05d2\u05d9\u05ea.",
+        idealAnswer: "\u05e2\u05e7\u05e8\u05d5\u05df \u05e9\u05dc\u05d8\u05d5\u05df \u05d4\u05d7\u05d5\u05e7 \u05e7\u05d5\u05d1\u05e2 \u05e9\u05db\u05dc \u05d4\u05d0\u05d6\u05e8\u05d7\u05d9\u05dd \u05d5\u05d2\u05dd \u05e8\u05e9\u05d5\u05d9\u05d5\u05ea \u05d4\u05e9\u05dc\u05d8\u05d5\u05df \u05db\u05e4\u05d5\u05e4\u05d9\u05dd \u05dc\u05d7\u05d5\u05e7 \u05d1\u05d0\u05d5\u05ea\u05d4 \u05de\u05d9\u05d3\u05d4, \u05d5\u05d4\u05d7\u05d5\u05e7 \u05e0\u05d7\u05e7\u05e7 \u05e2\u05dc \u05d9\u05d3\u05d9 \u05d4\u05e8\u05e9\u05d5\u05ea \u05d4\u05de\u05d7\u05d5\u05e7\u05e7\u05ea \u05de\u05ea\u05d5\u05da \u05d4\u05e1\u05db\u05de\u05d4.\n\u05e2\u05d1\u05e8\u05d9\u05d9\u05e0\u05d5\u05ea \u05e4\u05dc\u05d9\u05dc\u05d9\u05ea \u05e8\u05d2\u05d9\u05dc\u05d4 \u05e0\u05d5\u05d1\u05e2\u05ea \u05de\u05de\u05e0\u05d9\u05e2 \u05d0\u05d9\u05e9\u05d9 (\u05db\u05d2\u05d5\u05df \u05e8\u05e6\u05d5\u05df \u05dc\u05d4\u05ea\u05e2\u05e9\u05e8, \u05d9\u05e6\u05e8 \u05e0\u05e7\u05de\u05d4) \u05d5\u05d4\u05e2\u05d1\u05e8\u05d9\u05d9\u05df \u05e4\u05d5\u05e2\u05dc \u05d1\u05e1\u05ea\u05e8 \u05d5\u05d0\u05d9\u05e0\u05d5 \u05e4\u05d5\u05e2\u05dc \u05dc\u05e9\u05d9\u05e0\u05d5\u05d9 \u05de\u05d3\u05d9\u05e0\u05d9\u05d5\u05ea.\n\u05e2\u05d1\u05e8\u05d9\u05d9\u05e0\u05d5\u05ea \u05d0\u05d9\u05d3\u05d9\u05d0\u05d5\u05dc\u05d5\u05d2\u05d9\u05ea \u05e0\u05d5\u05d1\u05e2\u05ea \u05de\u05de\u05e0\u05d9\u05e2 \u05e4\u05d5\u05dc\u05d9\u05d8\u05d9 \u05d0\u05d5 \u05de\u05d5\u05e1\u05e8\u05d9, \u05e0\u05e2\u05e9\u05d9\u05ea \u05dc\u05e8\u05d5\u05d1 \u05d1\u05d0\u05d5\u05e4\u05df \u05e4\u05d5\u05de\u05d1\u05d9, \u05d1\u05de\u05d8\u05e8\u05d4 \u05dc\u05d4\u05e9\u05e4\u05d9\u05e2 \u05e2\u05dc \u05de\u05e7\u05d1\u05dc\u05d9 \u05d4\u05d4\u05d7\u05dc\u05d8\u05d5\u05ea \u05d5\u05dc\u05e9\u05e0\u05d5\u05ea \u05de\u05d3\u05d9\u05e0\u05d9\u05d5\u05ea \u05d0\u05d5 \u05d7\u05d5\u05e7, \u05de\u05ea\u05d5\u05da \u05d0\u05de\u05d5\u05e0\u05d4 \u05e9\u05d4\u05de\u05d3\u05d9\u05e0\u05d9\u05d5\u05ea \u05d4\u05e0\u05d5\u05db\u05d7\u05d9\u05ea \u05e9\u05d2\u05d5\u05d9\u05d4."
+      },
+      {
+        question: "\u05d4\u05e6\u05d2 \u05e9\u05ea\u05d9 \u05d3\u05e8\u05db\u05d9\u05dd \u05e9\u05d1\u05d4\u05df \u05d4\u05de\u05de\u05e9\u05dc\u05d4 \u05de\u05e4\u05d5\u05e7\u05d7\u05ea \u05e2\u05dc \u05d9\u05d3\u05d9 \u05d4\u05db\u05e0\u05e1\u05ea (\u05de\u05e2\u05e8\u05db\u05ea \u05d1\u05dc\u05de\u05d9\u05dd \u05d5\u05d0\u05d9\u05d6\u05d5\u05e0\u05d9\u05dd).",
+        idealAnswer: "1. \u05d7\u05d5\u05e7 \u05d4\u05ea\u05e7\u05e6\u05d9\u05d1 - \u05d4\u05db\u05e0\u05e1\u05ea \u05de\u05d0\u05e9\u05e8\u05ea \u05d0\u05ea \u05d7\u05d5\u05e7 \u05d4\u05ea\u05e7\u05e6\u05d9\u05d1, \u05d5\u05d1\u05db\u05da \u05de\u05e4\u05e7\u05d7\u05ea \u05e2\u05dc \u05d4\u05d5\u05e6\u05d0\u05d5\u05ea \u05d4\u05de\u05de\u05e9\u05dc\u05d4. \u05dc\u05dc\u05d0 \u05d0\u05d9\u05e9\u05d5\u05e8 \u05ea\u05e7\u05e6\u05d9\u05d1 \u05d4\u05de\u05de\u05e9\u05dc\u05d4 \u05e0\u05d5\u05e4\u05dc\u05ea.\n2. \u05d4\u05e6\u05e2\u05ea \u05d0\u05d9-\u05d0\u05de\u05d5\u05df - \u05d4\u05db\u05e0\u05e1\u05ea \u05d9\u05db\u05d5\u05dc\u05d4 \u05dc\u05d4\u05e4\u05d9\u05dc \u05d0\u05ea \u05d4\u05de\u05de\u05e9\u05dc\u05d4 \u05d1\u05e8\u05d5\u05d1 \u05e7\u05d5\u05dc\u05d5\u05ea \u05d3\u05e8\u05da \u05d4\u05e6\u05e2\u05ea \u05d0\u05d9-\u05d0\u05de\u05d5\u05df \u05d0\u05dd \u05d4\u05de\u05de\u05e9\u05dc\u05d4 \u05de\u05d0\u05d1\u05d3\u05ea \u05d0\u05ea \u05ea\u05de\u05d9\u05db\u05ea \u05d4\u05e4\u05e8\u05dc\u05de\u05e0\u05d8."
+      },
+      {
+        question: "\u05d4\u05e1\u05d1\u05e8 \u05d0\u05ea \u05d4\u05de\u05d5\u05e9\u05d2 '\u05d3\u05de\u05d5\u05e7\u05e8\u05d8\u05d9\u05d4 \u05de\u05ea\u05d2\u05d5\u05e0\u05e0\u05ea' \u05d5\u05d4\u05e6\u05d2 \u05d3\u05d5\u05d2\u05de\u05d4 \u05d0\u05d7\u05ea \u05de\u05d9\u05d9\u05e9\u05d5\u05de\u05d5 \u05d1\u05d9\u05e9\u05e8\u05d0\u05dc.",
+        idealAnswer: "\u05d3\u05de\u05d5\u05e7\u05e8\u05d8\u05d9\u05d4 \u05de\u05ea\u05d2\u05d5\u05e0\u05e0\u05ea \u05d4\u05d9\u05d0 \u05d6\u05db\u05d5\u05ea\u05d4 \u05e9\u05dc \u05de\u05d3\u05d9\u05e0\u05d4 \u05d3\u05de\u05d5\u05e7\u05e8\u05d8\u05d9\u05ea \u05dc\u05e4\u05e2\u05d5\u05dc \u05d1\u05d7\u05e8\u05d9\u05e4\u05d5\u05ea (\u05ea\u05d5\u05da \u05e4\u05d2\u05d9\u05e2\u05d4 \u05d1\u05d6\u05db\u05d5\u05d9\u05d5\u05ea \u05de\u05e1\u05d5\u05d9\u05de\u05d5\u05ea) \u05db\u05d3\u05d9 \u05dc\u05d4\u05ea\u05d2\u05d5\u05e0\u05df \u05de\u05e4\u05e0\u05d9 \u05e7\u05d1\u05d5\u05e6\u05d5\u05ea (\u05de\u05d5\u05e1\u05d3\u05d5\u05ea \u05d0\u05d5 \u05d9\u05d7\u05d9\u05d3\u05d9\u05dd) \u05d4\u05de\u05e0\u05e6\u05dc\u05d9\u05dd \u05d0\u05ea \u05d4\u05db\u05dc\u05d9\u05dd \u05d4\u05d3\u05de\u05d5\u05e7\u05e8\u05d8\u05d9\u05d9\u05dd (\u05db\u05de\u05d5 \u05d7\u05d5\u05e4\u05e9 \u05d4\u05d4\u05ea\u05d0\u05d2\u05d3\u05d5\u05ea \u05d5\u05d4\u05d1\u05d9\u05d8\u05d5\u05d9) \u05db\u05d3\u05d9 \u05dc\u05e4\u05d2\u05d5\u05e2 \u05d1\u05e2\u05e6\u05dd \u05e7\u05d9\u05d5\u05de\u05d4 \u05e9\u05dc \u05d4\u05de\u05d3\u05d9\u05e0\u05d4 \u05db\u05d3\u05de\u05d5\u05e7\u05e8\u05d8\u05d9\u05ea \u05d0\u05d5 \u05d9\u05d4\u05d5\u05d3\u05d9\u05ea.\n\u05d3\u05d5\u05d2\u05de\u05d4 \u05d1\u05d9\u05e9\u05e8\u05d0\u05dc: '\u05d7\u05d5\u05e7 \u05d9\u05e1\u05d5\u05d3 \u05d4\u05db\u05e0\u05e1\u05ea (\u05e1\u05e2\u05d9\u05e3 7\u05d0)' \u05d4\u05de\u05d0\u05e4\u05e9\u05e8 \u05e4\u05e1\u05d9\u05dc\u05ea \u05e8\u05e9\u05d9\u05de\u05d4 \u05de\u05dc\u05d4\u05ea\u05de\u05d5\u05d3\u05d3 \u05d1\u05d1\u05d7\u05d9\u05e8\u05d5\u05ea \u05d0\u05dd \u05de\u05d8\u05e8\u05ea\u05d4 \u05d4\u05d9\u05d0 \u05e9\u05dc\u05d9\u05dc\u05ea \u05e7\u05d9\u05d5\u05de\u05d4 \u05e9\u05dc \u05d9\u05e9\u05e8\u05d0\u05dc \u05db\u05de\u05d3\u05d9\u05e0\u05d4 \u05d9\u05d4\u05d5\u05d3\u05d9\u05ea \u05d5\u05d3\u05de\u05d5\u05e7\u05e8\u05d8\u05d9\u05ea, \u05d0\u05d5 \u05ea\u05de\u05d9\u05db\u05d4 \u05d1\u05de\u05d0\u05d1\u05e7 \u05de\u05d6\u05d5\u05d9\u05df \u05e0\u05d2\u05d3\u05d4."
+      }
+    ];
+
+    // --- STATE ---
+    var mode = "all";
+    var shuffled = true;
+    var list = [];
+    var idx = 0;
+    var correct = 0;
+    var wrong = 0;
+    var isStage2 = false;
+    var currentOpenQ = null;
+
+    // Audio context
+    var C = new (window.AudioContext || window.webkitAudioContext)();
+    var muted = false;
+
+    // Persisted State
+    var mistakes = new Set(JSON.parse(localStorage.getItem("civics_mistakes") || "[]"));
+    var successes = new Set(JSON.parse(localStorage.getItem("civics_successes") || "[]"));
+    var civics_stats = JSON.parse(localStorage.getItem("civics_stats") || '{"examsPassed":0, "openCorrect":0, "openWrong":0}');
+    if (!civics_stats.openCorrect) civics_stats.openCorrect = 0;
+    if (!civics_stats.openWrong) civics_stats.openWrong = 0;
+
+    function updateStage2UnlockUI() {
+      var stage2Btn = document.getElementById("stage2Btn");
+      var stageLabel = document.getElementById("stageLabel");
+      if (civics_stats.examsPassed >= 3) {
+        stage2Btn.style.display = "block";
+        if (isStage2) stageLabel.style.display = "inline-block";
+        else stageLabel.style.display = "none";
+      }
+    }
+
+    function beep(f, t, vol) {
+      if (muted) return;
+      if (C.state === "suspended") C.resume();
+      var o = C.createOscillator(), g = C.createGain();
+      o.type = "sine"; o.frequency.value = f;
+      g.gain.setValueAtTime(vol, C.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.01, C.currentTime + t);
+      o.connect(g); g.connect(C.destination);
+      o.start(); o.stop(C.currentTime + t);
+    }
+    function playCorrect() { beep(600, 0.2, 0.2); setTimeout(function () { beep(800, 0.3, 0.2); }, 100); }
+    function playWrong() { beep(300, 0.4, 0.3); setTimeout(function () { beep(250, 0.4, 0.3); }, 150); }
+    function toggleMute() {
+      muted = !muted;
+      document.getElementById("muteBtn").textContent = muted ? "\uD83D\uDD07" : "\uD83D\uDD0A";
+    }
+
+    function saveSets() {
+      localStorage.setItem("civics_mistakes", JSON.stringify(Array.from(mistakes)));
+      localStorage.setItem("civics_successes", JSON.stringify(Array.from(successes)));
+      localStorage.setItem("civics_stats", JSON.stringify(civics_stats));
+    }
+
+    function shuffleArray(arr) {
+      var a = arr.slice();
+      for (var i = a.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+      }
+      return a;
+    }
+
+    function setModeLabel(txt) { document.getElementById("modeLabel").textContent = txt; }
+    function topicChanged() { startAll(true); }
+
+    function startAll(doShuffle) {
+      isStage2 = false; updateStage2UnlockUI();
+      document.getElementById("openQuestionArea").style.display = "none";
+      document.getElementById("answersArea").style.display = "block";
+      mode = "all"; shuffled = doShuffle;
+      var topic = document.getElementById("topicFilter").value;
+      var baseQuestions = QUESTIONS;
+      if (topic !== "all") {
+        baseQuestions = QUESTIONS.filter(function (q) { return q.topicId == topic; });
+      }
+      list = doShuffle ? shuffleArray(baseQuestions) : baseQuestions.slice();
+      idx = 0; correct = 0; wrong = 0;
+      setModeLabel(doShuffle ? "\u05ea\u05e8\u05d2\u05d5\u05dc (\u05de\u05e2\u05d5\u05e8\u05d1\u05d1)" : "\u05ea\u05e8\u05d2\u05d5\u05dc (\u05e1\u05d3\u05e8 \u05e7\u05d1\u05d5\u05e2)");
+      initCounters();
+      render();
+    }
+
+    function startMistakes() {
+      isStage2 = false; updateStage2UnlockUI();
+      document.getElementById("openQuestionArea").style.display = "none";
+      document.getElementById("answersArea").style.display = "block";
+      mode = "mistakes"; shuffled = true;
+      var arr = QUESTIONS.filter(function (q) { return mistakes.has(q.id); });
+      if (!arr.length) { alert("\u05db\u05dc \u05d4\u05db\u05d1\u05d5\u05d3! \u05d0\u05d9\u05df \u05d8\u05e2\u05d5\u05d9\u05d5\u05ea \u05e9\u05de\u05d5\u05e8\u05d5\u05ea."); return; }
+      list = shuffleArray(arr);
+      idx = 0; correct = 0; wrong = 0;
+      setModeLabel("\u05d7\u05d6\u05e8\u05ea \u05d8\u05e2\u05d5\u05d9\u05d5\u05ea");
+      initCounters();
+      render();
+    }
+
+    function startExam() {
+      isStage2 = false; updateStage2UnlockUI();
+      document.getElementById("openQuestionArea").style.display = "none";
+      document.getElementById("answersArea").style.display = "block";
+      mode = "exam";
+      list = shuffleArray(QUESTIONS).slice(0, 70);
+      idx = 0; correct = 0; wrong = 0;
+      setModeLabel("\u05de\u05d1\u05d7\u05df \u05e9\u05dc\u05d1 1");
+      initCounters();
+      render();
+    }
+
+    function startStage2() {
+      isStage2 = true; updateStage2UnlockUI();
+      document.getElementById("openQuestionArea").style.display = "block";
+      document.getElementById("answersArea").style.display = "none";
+      mode = "stage2";
+      list = shuffleArray(OPEN_QUESTIONS);
+      idx = 0; correct = 0; wrong = 0;
+      setModeLabel("\u05ea\u05e8\u05d2\u05d5\u05dc \u05e9\u05dc\u05d1 2");
+      initCounters();
+      render();
+    }
+
+    function devSkip() {
+      civics_stats.examsPassed = 3;
+      saveSets();
+      updateStage2UnlockUI();
+      startStage2();
+    }
+
+    function resetAll() {
+      if (!confirm("\u05d4\u05d0\u05dd \u05dc\u05d0\u05e4\u05e1 \u05d0\u05ea \u05db\u05dc \u05d4\u05e0\u05ea\u05d5\u05e0\u05d9\u05dd, \u05d4\u05e1\u05d8\u05d8\u05d9\u05e1\u05d8\u05d9\u05e7\u05d5\u05ea \u05d5\u05d4\u05d4\u05e6\u05dc\u05d7\u05d5\u05ea?")) return;
+      mistakes.clear();
+      successes.clear();
+      civics_stats = { examsPassed: 0, openCorrect: 0, openWrong: 0 };
+      saveSets();
+      updateStage2UnlockUI();
+      document.getElementById("topicFilter").value = "all";
+      startAll(true);
+    }
+
+    function initCounters() {
+      document.getElementById("qtotal").textContent = list.length;
+      document.getElementById("correct").textContent = correct;
+      document.getElementById("wrong").textContent = wrong;
+    }
+
+    function render() {
+      if (idx >= list.length) {
+        finishSequence();
+        return;
+      }
+      var q = list[idx];
+      document.getElementById("qnum").textContent = (idx + 1);
+      document.getElementById("progressBar").style.width = ((idx / list.length) * 100) + "%";
+      document.getElementById("questionText").textContent = q.question;
+      document.getElementById("explainArea").textContent = "";
+
+      if (!isStage2) {
+        var answersArea = document.getElementById("answersArea");
+        answersArea.innerHTML = "";
+        var built = q.answers.map(function (t, i) { return { text: t, isCorrect: i === q.correctIndex }; });
+        var shown = shuffleArray(built);
+        shown.forEach(function (opt, vIdx) {
+          var btn = document.createElement("button");
+          btn.className = "answer-btn";
+          btn.innerHTML = "<span>" + String.fromCharCode(1488 + vIdx) + ". " + opt.text + "</span><span></span>";
+          btn.onclick = function () { choose(btn, opt.isCorrect, shown, q); };
+          answersArea.appendChild(btn);
+        });
+      } else {
+        currentOpenQ = q;
+        document.getElementById("openAnswerInput").value = "";
+        document.getElementById("idealAnswerBox").style.display = "none";
+        document.getElementById("showAnswerBtn").style.display = "block";
+      }
+    }
+
+    function finishSequence() {
+      var percent = Math.round((correct / Math.max(1, list.length)) * 100);
+      document.getElementById("questionText").innerHTML = "\u05e1\u05d9\u05d5\u05dd \u05ea\u05e8\u05d2\u05d5\u05dc \uD83C\uDF89";
+      document.getElementById("progressBar").style.width = "100%";
+      document.getElementById("explainArea").textContent = "";
+
+      if (mode === "exam") {
+        if (percent >= 90) {
+          civics_stats.examsPassed++;
+          saveSets();
+          document.getElementById("answersArea").innerHTML = '<div class="small" style="font-size:20px; color:#16a34a;"><b>\u05de\u05d1\u05d7\u05df \u05e2\u05d5\u05d1\u05e8! \u05e6\u05d9\u05d5\u05df: ' + percent + '%</b><br>\u05db\u05dc \u05d4\u05db\u05d1\u05d5\u05d3! \u05e2\u05d1\u05e8\u05ea ' + civics_stats.examsPassed + ' \u05de\u05d1\u05d7\u05e0\u05d9\u05dd.</div>';
+          if (civics_stats.examsPassed === 3) {
+            document.getElementById("answersArea").innerHTML += '<div style="margin-top:20px; font-weight:bold; color:#b45309; font-size:22px;">\uD83C\uDF89 \u05e9\u05dc\u05d1 2 (\u05e9\u05d0\u05dc\u05d5\u05ea \u05e4\u05ea\u05d5\u05d7\u05d5\u05ea) \u05d4\u05d5\u05e4\u05e2\u05dc \u05d1\u05d4\u05e6\u05dc\u05d7\u05d4! \uD83C\uDF89</div>';
+            updateStage2UnlockUI();
+          }
+        } else {
+          document.getElementById("answersArea").innerHTML = '<div class="small" style="font-size:20px; color:#dc2626;"><b>\u05e0\u05db\u05e9\u05dc\u05ea \u05d1\u05de\u05d1\u05d7\u05df. \u05e6\u05d9\u05d5\u05df: ' + percent + '%</b><br>\u05e0\u05d3\u05e8\u05e9 90% \u05db\u05d3\u05d9 \u05dc\u05e2\u05d1\u05d5\u05e8.</div>';
+        }
+      } else {
+        document.getElementById("answersArea").innerHTML = '<div class="small">\u05e6\u05d9\u05d5\u05df: <b>' + percent + '%</b> \u00b7 \u05e0\u05db\u05d5\u05df: ' + correct + ' \u00b7 \u05e9\u05d2\u05d5\u05d9: ' + wrong + '</div>';
+        if (isStage2) {
+          document.getElementById("openQuestionArea").style.display = "none";
+        }
+      }
+    }
+
+    function choose(btn, isCorrect, shown, q) {
+      var buttons = Array.from(document.querySelectorAll(".answer-btn"));
+      if (buttons.some(function (b) { return b.classList.contains("correct") || b.classList.contains("wrong"); })) return;
+
+      if (isCorrect) {
+        btn.classList.add("correct");
+        correct++;
+        successes.add(q.id);
+        mistakes.delete(q.id);
+        playCorrect();
+      } else {
+        btn.classList.add("wrong");
+        wrong++;
+        mistakes.add(q.id);
+        playWrong();
+        buttons.forEach(function (b, i) {
+          if (shown[i].isCorrect) b.classList.add("correct");
+        });
+      }
+      saveSets();
+      document.getElementById("correct").textContent = correct;
+      document.getElementById("wrong").textContent = wrong;
+      if (q.explanation) document.getElementById("explainArea").textContent = "\u05d4\u05e1\u05d1\u05e8: " + q.explanation;
+      setTimeout(function () { idx++; render(); }, 1200);
+    }
+
+    function showOpenAnswer() {
+      if (!currentOpenQ) return;
+      document.getElementById("showAnswerBtn").style.display = "none";
+      document.getElementById("idealAnswerBox").style.display = "block";
+      document.getElementById("idealAnswerText").textContent = currentOpenQ.idealAnswer;
+    }
+
+    function gradeOpenAnswer(isUserCorrect) {
+      if (isUserCorrect) {
+        civics_stats.openCorrect++;
+        correct++;
+        playCorrect();
+      } else {
+        civics_stats.openWrong++;
+        wrong++;
+        playWrong();
+      }
+      saveSets();
+      document.getElementById("correct").textContent = correct;
+      document.getElementById("wrong").textContent = wrong;
+      setTimeout(function () { idx++; render(); }, 800);
+    }
+
+    function openModal(id) { document.getElementById(id).style.display = "flex"; }
+    function closeModal(id) { document.getElementById(id).style.display = "none"; }
+
+    function openStats() {
+      var ts = civics_stats;
+      var html = '<div class="stat-row"><span>\u05de\u05d1\u05d7\u05e0\u05d9\u05dd \u05e9\u05e2\u05d1\u05e8\u05ea \u05d1\u05d4\u05e6\u05dc\u05d7\u05d4 (90%+):</span> <span class="stat-val">' + ts.examsPassed + '</span></div>';
+      html += '<div class="stat-row" style="color:#d97706; font-weight:bold;"><span>\u05e9\u05d0\u05dc\u05d5\u05ea \u05e4\u05ea\u05d5\u05d7\u05d5\u05ea (\u05e9\u05dc\u05d1 2) \u05e0\u05db\u05d5\u05e0\u05d5\u05ea:</span> <span class="stat-val" style="color:#b45309;">' + ts.openCorrect + '</span></div>';
+      html += '<div class="stat-row" style="color:#d97706; font-weight:bold;"><span>\u05e9\u05d0\u05dc\u05d5\u05ea \u05e4\u05ea\u05d5\u05d7\u05d5\u05ea (\u05e9\u05dc\u05d1 2) \u05e9\u05d2\u05d5\u05d9\u05d5\u05ea:</span> <span class="stat-val" style="color:#b45309;">' + ts.openWrong + '</span></div>';
+      html += '<hr style="border:1px solid #e2e8f0; margin:15px 0;">';
+      [1, 2, 3, 4].forEach(function (t) {
+        var tQ = QUESTIONS.filter(function (q) { return q.topicId == t; });
+        var tS = tQ.filter(function (q) { return successes.has(q.id); }).length;
+        var pct = Math.round((tS / tQ.length) * 100);
+        html += '<div class="stat-row"><span>\u05e0\u05d5\u05e9\u05d0 ' + t + ' \u05d4\u05d5\u05e9\u05dc\u05dd:</span> <span class="stat-val">' + pct + '% (' + tS + '/' + tQ.length + ')</span></div>';
+      });
+      document.getElementById("statsContent").innerHTML = html;
+      openModal("statsModal");
+    }
+
+    window.onload = function () {
+      updateStage2UnlockUI();
+      startAll(false);
+    };
+  </script>
+</body>
+
+</html>
