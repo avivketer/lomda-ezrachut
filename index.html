@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>לומדת אזרחות – 200 שאלות עם שלב 2</title>
+  <title>לומדת אזרחות – בגרות תשפ״ו</title>
   <style>
     * {
       box-sizing: border-box;
@@ -12,10 +12,11 @@
 
     body {
       font-family: system-ui, -apple-system, "Segoe UI", Arial;
-      background: linear-gradient(135deg, #e0f2fe, #f8fafc);
+      background: linear-gradient(135deg, #e0f2fe, #f0f4ff);
       margin: 0;
       padding: 16px;
       direction: rtl;
+      min-height: 100vh;
     }
 
     .container {
@@ -23,24 +24,200 @@
       margin: 0 auto;
       background: #fff;
       border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+      padding: 20px;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.10);
     }
 
     h1 {
       text-align: center;
-      margin: 0 0 10px;
+      margin: 0 0 16px;
+      color: #1e293b;
+      font-size: 26px;
     }
 
+    /* ─── STAGE ROADMAP ─── */
+    .stage-roadmap {
+      display: flex;
+      gap: 0;
+      margin-bottom: 20px;
+      position: relative;
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 4px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .stage-card {
+      flex: 1;
+      padding: 12px 10px;
+      text-align: center;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.25s;
+      position: relative;
+      user-select: none;
+    }
+
+    .stage-card .stage-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      font-weight: 800;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .stage-card .stage-title {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .stage-card .stage-sub {
+      display: block;
+      font-size: 11px;
+      line-height: 1.2;
+      margin-top: 3px;
+      opacity: 0.8;
+    }
+
+    .stage-card .lock-icon {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    /* Stage states */
+    .stage-card.locked {
+      background: #f1f5f9;
+      color: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    .stage-card.locked .stage-num {
+      background: #e2e8f0;
+      color: #94a3b8;
+    }
+
+    .stage-card.locked:hover {
+      background: #e8edf3;
+    }
+
+    .stage-card.unlocked {
+      background: #fff;
+      color: #334155;
+      cursor: pointer;
+    }
+
+    .stage-card.unlocked:hover {
+      background: #f0f4ff;
+    }
+
+    .stage-card.active {
+      background: #4f46e5;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+
+    .stage-card.active .stage-num {
+      background: rgba(255, 255, 255, 0.25);
+      color: #fff;
+    }
+
+    .stage-card.active .stage-sub {
+      opacity: 0.9;
+    }
+
+    /* Color variants when unlocked but not active */
+    .stage-card[data-stage="1"].unlocked .stage-num {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .stage-card[data-stage="2"].unlocked .stage-num {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .stage-card[data-stage="3"].unlocked .stage-num {
+      background: #ede9fe;
+      color: #5b21b6;
+    }
+
+    .stage-card[data-stage="4"].unlocked .stage-num {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    /* Active color variants */
+    .stage-card[data-stage="1"].active {
+      background: #16a34a;
+    }
+
+    .stage-card[data-stage="2"].active {
+      background: #d97706;
+    }
+
+    .stage-card[data-stage="3"].active {
+      background: #7c3aed;
+    }
+
+    .stage-card[data-stage="4"].active {
+      background: #dc2626;
+    }
+
+    /* Tooltip */
+    .stage-tooltip {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 10px);
+      right: 50%;
+      transform: translateX(50%);
+      background: #1e293b;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.5;
+      white-space: nowrap;
+      z-index: 50;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+      pointer-events: none;
+      max-width: 240px;
+      white-space: normal;
+      text-align: center;
+    }
+
+    .stage-tooltip::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      right: 50%;
+      transform: translateX(50%);
+      border: 6px solid transparent;
+      border-top-color: #1e293b;
+    }
+
+    .stage-card:hover .stage-tooltip {
+      display: block;
+    }
+
+    /* ─── OPTIONS BAR ─── */
     .options-bar {
       background: #f1f5f9;
-      padding: 12px;
+      padding: 10px 12px;
       border-radius: 12px;
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 15px;
+      margin-bottom: 14px;
       flex-wrap: wrap;
     }
 
@@ -48,41 +225,43 @@
       padding: 8px 12px;
       border-radius: 8px;
       border: 1px solid #cbd5e1;
-      font-size: 15px;
+      font-size: 14px;
       font-family: inherit;
       outline: none;
       flex: 1;
-      min-width: 200px;
+      min-width: 180px;
     }
 
     .icon-btn {
       background: #fff;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
-      padding: 8px 12px;
-      font-size: 15px;
+      padding: 7px 12px;
+      font-size: 13px;
+      font-weight: 600;
       cursor: pointer;
       transition: 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      color: #475569;
+      white-space: nowrap;
     }
 
     .icon-btn:hover {
       background: #e2e8f0;
+      color: #1e293b;
     }
 
+    /* ─── TOPBAR ─── */
     .topbar {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .pill {
-      padding: 6px 10px;
+      padding: 5px 10px;
       border-radius: 999px;
       background: #eef2ff;
       color: #3730a3;
@@ -96,26 +275,27 @@
     }
 
     .progress {
-      height: 10px;
+      height: 8px;
       background: #e5e7eb;
       border-radius: 999px;
       overflow: hidden;
-      margin: 10px 0 14px;
+      margin: 8px 0 14px;
     }
 
     .progress-inner {
       height: 100%;
       width: 0%;
       background: linear-gradient(90deg, #4f46e5, #22c55e);
-      transition: width 0.2s ease;
+      transition: width 0.25s ease;
     }
 
+    /* ─── QUESTION AREA ─── */
     #questionText {
       font-size: 18px;
       font-weight: 700;
       margin: 6px 0 14px;
       color: #111827;
-      line-height: 1.4;
+      line-height: 1.45;
     }
 
     .answer-btn {
@@ -161,25 +341,25 @@
       line-height: 1.4;
     }
 
+    /* ─── CONTROLS ─── */
     .controls {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
-      margin-top: 16px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       align-items: stretch;
     }
 
     .controls button {
-      flex: 1 1 180px;
-      padding: 12px;
+      flex: 1 1 160px;
+      padding: 11px;
       border: none;
-      border-radius: 12px;
+      border-radius: 10px;
       background: #e5e7eb;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       transition: 0.2s;
@@ -204,23 +384,27 @@
       color: #7f1d1d;
     }
 
-    .mistakes-btn {
-      background: #f59e0b !important;
-      color: #fff;
+    .warn:hover {
+      background: #f87171 !important;
     }
 
-    .mistakes-btn:hover {
-      background: #d97706 !important;
+    .exam {
+      background: #16a34a !important;
+      color: white;
+    }
+
+    .exam:hover {
+      background: #15803d !important;
     }
 
     .topic-subtitle {
       text-align: center;
-      font-size: 14px;
+      font-size: 13px;
       color: #6366f1;
       font-weight: 600;
       margin-bottom: 6px;
       background: #eef2ff;
-      padding: 6px 12px;
+      padding: 5px 12px;
       border-radius: 8px;
     }
 
@@ -235,15 +419,17 @@
       background: #eef2ff;
       border: 1px solid #c7d2fe;
       border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      font-size: 16px;
+      width: 30px;
+      height: 30px;
+      font-size: 14px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: 0.2s;
       flex-shrink: 0;
+      color: #4f46e5;
+      font-weight: bold;
     }
 
     .help-btn:hover {
@@ -262,26 +448,30 @@
       margin-bottom: 8px;
     }
 
-    .warn:hover {
-      background: #f87171 !important;
+    .source-box {
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 12px;
+      color: #78350f;
     }
 
-    .exam {
-      background: #16a34a !important;
-      color: white;
+    .source-box strong {
+      display: block;
+      margin-bottom: 6px;
     }
 
-    .exam:hover {
-      background: #15803d !important;
-    }
-
+    /* ─── MODALS ─── */
     .modal-overlay {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.45);
       display: none;
       justify-content: center;
       align-items: center;
@@ -292,7 +482,7 @@
     .modal {
       background: #fff;
       padding: 24px;
-      border-radius: 20px;
+      border-radius: 18px;
       max-width: 500px;
       width: 100%;
       max-height: 85vh;
@@ -303,22 +493,23 @@
 
     .modal h2 {
       margin-top: 0;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       color: #1e293b;
       border-bottom: 2px solid #e2e8f0;
       padding-bottom: 10px;
+      font-size: 20px;
     }
 
     .close-modal {
       position: absolute;
-      top: 20px;
-      left: 20px;
+      top: 18px;
+      left: 18px;
       background: #f1f5f9;
       border: none;
       border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      font-size: 18px;
+      width: 30px;
+      height: 30px;
+      font-size: 16px;
       cursor: pointer;
       color: #64748b;
       display: flex;
@@ -334,8 +525,9 @@
     .stat-row {
       display: flex;
       justify-content: space-between;
-      padding: 12px 0;
+      padding: 10px 0;
       border-bottom: 1px solid #f1f5f9;
+      font-size: 14px;
     }
 
     .stat-row:last-child {
@@ -348,19 +540,159 @@
     }
 
     .glossary-item {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       border-right: 4px solid #4f46e5;
-      padding-right: 12px;
+      padding: 10px 12px 10px 14px;
       background: #f8fafc;
-      padding: 12px 12px 12px 16px;
       border-radius: 8px;
     }
 
     .glossary-term {
       font-weight: bold;
       color: #0f172a;
-      font-size: 16px;
+      font-size: 15px;
       margin-bottom: 4px;
+    }
+
+    .glossary-search {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      margin-bottom: 14px;
+      outline: none;
+    }
+
+    .glossary-search:focus {
+      border-color: #4f46e5;
+    }
+
+    /* ─── MEMORY GAME ─── */
+    .memory-modal {
+      max-width: 640px;
+    }
+
+    .memory-info {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 480px) {
+      .memory-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .mem-card {
+      background: #4f46e5;
+      color: white;
+      padding: 12px 6px;
+      border-radius: 10px;
+      cursor: pointer;
+      min-height: 65px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      text-align: center;
+      transition: 0.2s;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    .mem-card.flipped {
+      background: #fff;
+      color: #0f172a;
+      border: 2px solid #4f46e5;
+    }
+
+    .mem-card.matched {
+      background: #16a34a;
+      color: #fff;
+      cursor: default;
+    }
+
+    .memory-controls {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .memory-controls button {
+      padding: 9px 18px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .memory-score {
+      text-align: center;
+      margin: 8px 0;
+      font-weight: 600;
+      color: #4f46e5;
+      font-size: 14px;
+    }
+
+    .sim-select-btn {
+      width: 100%;
+      padding: 14px;
+      margin: 6px 0;
+      border-radius: 14px;
+      border: 2px solid #e5e7eb;
+      background: #f9fafb;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      text-align: right;
+      transition: 0.2s;
+    }
+
+    .sim-select-btn:hover {
+      background: #eef2f7;
+      border-color: #dc2626;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 600px) {
+      .stage-card .stage-title {
+        font-size: 11px;
+      }
+
+      .stage-card .stage-sub {
+        font-size: 10px;
+      }
+
+      .stage-card .stage-num {
+        width: 26px;
+        height: 26px;
+        font-size: 12px;
+      }
+
+      .stage-card {
+        padding: 10px 6px;
+      }
+
+      .controls button {
+        flex: 1 1 130px;
+        font-size: 13px;
+        padding: 10px 6px;
+      }
     }
   </style>
 </head>
@@ -370,7 +702,40 @@
   <div class="container">
     <h1>לומדת אזרחות</h1>
 
-    <div class="options-bar">
+    <!-- ─── STAGE ROADMAP ─── -->
+    <div class="stage-roadmap" id="stageRoadmap">
+      <div class="stage-card active" data-stage="1" onclick="handleStageClick(1)">
+        <div class="stage-num">1</div>
+        <span class="stage-title">שאלות סגורות</span>
+        <span class="stage-sub">200 שאלות אמריקאיות</span>
+        <div class="stage-tooltip">שלב 1: תרגול 200 שאלות סגורות בארבעה נושאים.<br>עבור מבחן עם 90% כדי להתקדם לשלב הבא.
+        </div>
+      </div>
+      <div class="stage-card locked" data-stage="2" onclick="handleStageClick(2)">
+        <span class="lock-icon">&#x1F512;</span>
+        <div class="stage-num">2</div>
+        <span class="stage-title">שאלות פתוחות</span>
+        <span class="stage-sub">40 שאלות בשפה פשוטה</span>
+        <div class="stage-tooltip">שלב 2: שאלות פתוחות בשפה מופשטת.<br>נפתח לאחר 3 מבחנים מוצלחים בשלב 1 (90%+).</div>
+      </div>
+      <div class="stage-card locked" data-stage="3" onclick="handleStageClick(3)">
+        <span class="lock-icon">&#x1F512;</span>
+        <div class="stage-num">3</div>
+        <span class="stage-title">תרגול בגרות</span>
+        <span class="stage-sub">20 שאלות ברמת בגרות</span>
+        <div class="stage-tooltip">שלב 3: שאלות פתוחות בסגנון בגרות.<br>נפתח לאחר 5 תשובות נכונות בשלב 2.</div>
+      </div>
+      <div class="stage-card locked" data-stage="4" onclick="handleStageClick(4)">
+        <span class="lock-icon">&#x1F512;</span>
+        <div class="stage-num">4</div>
+        <span class="stage-title">סימולציות</span>
+        <span class="stage-sub">3 מבחני בגרות מלאים</span>
+        <div class="stage-tooltip">שלב 4: סימולציות מבחן בגרות מלאות.<br>נפתח לאחר 5 תשובות נכונות בשלב 3.</div>
+      </div>
+    </div>
+
+    <!-- ─── OPTIONS BAR ─── -->
+    <div class="options-bar" id="optionsBar">
       <select id="topicFilter" onchange="topicChanged()">
         <option value="all">כל הנושאים (200 שאלות)</option>
         <option value="1">נושא 1: עקרונות יסוד דמוקרטיה</option>
@@ -378,15 +743,15 @@
         <option value="3">נושא 3: מוסדות השלטון</option>
         <option value="4">נושא 4: לאומיות ומיעוטים</option>
       </select>
-      <button class="icon-btn" onclick="toggleMute()" id="muteBtn" title="השתקת סאונד">🔊</button>
-      <button class="icon-btn" onclick="openModal('glossaryModal')" title="מילון מושגים">📖 מילון</button>
-      <button class="icon-btn" onclick="openStats()" title="סטטיסטיקה">📊 סטטיסטיקה</button>
-      <button class="icon-btn" id="stage2Btn" onclick="devSkip()" title="שלב 2" style="display:none;">📝 שלב 2</button>
+      <button class="icon-btn" onclick="toggleMute()" id="muteBtn" title="השתקת סאונד">צליל</button>
+      <button class="icon-btn" onclick="openModal('glossaryModal')" title="מילון מושגים">מילון</button>
+      <button class="icon-btn" onclick="openMemoryGame()" title="משחק זיכרון">משחק</button>
+      <button class="icon-btn" onclick="openStats()" title="סטטיסטיקה">נתונים</button>
     </div>
 
+    <!-- ─── STATUS BAR ─── -->
     <div class="topbar">
       <div class="pill gray" id="modeLabel">הכול</div>
-      <div class="pill" id="stageLabel" style="background:#fcd34d; color:#92400e; display:none;">שלב 2 🔓</div>
       <div class="pill">נכון: <span id="correct">0</span></div>
       <div class="pill" style="background:#fee2e2;color:#991b1b;">שגוי: <span id="wrong">0</span></div>
       <div class="pill gray">שאלה <span id="qnum">1</span> / <span id="qtotal">0</span></div>
@@ -396,153 +761,204 @@
       <div class="progress-inner" id="progressBar"></div>
     </div>
 
-    <div class="controls">
-      <button class="exam" onclick="startExam()">🏆 מבחן שלב 1</button>
-      <button class="primary" onclick="startAll(true)">תרגול אקראי</button>
-      <button class="primary" onclick="startAll(false)" style="background:#6366f1 !important;">תרגול לפי סדר</button>
-      <button class="mistakes-btn" onclick="startMistakes()">חזרה על טעויות</button>
-      <button style="background:#22c55e !important;color:#fff;" onclick="startSuccesses()">חזרה על הצלחות</button>
-      <button class="warn" onclick="resetAll()">איפוס התקדמות</button>
-    </div>
+    <!-- ─── STAGE CONTROLS (dynamic per stage) ─── -->
+    <div class="controls" id="stageControls"></div>
 
+    <!-- ─── QUESTION AREA ─── -->
     <div id="questionArea">
       <div class="topic-subtitle" id="topicSubtitle"></div>
       <div class="help-row">
-        <button class="help-btn" id="helpBtn" onclick="toggleHelp()" title="רמז להבנת השאלה">💡</button>
+        <button class="help-btn" id="helpBtn" onclick="toggleHelp()" title="רמז">?</button>
         <div id="questionText"></div>
       </div>
       <div class="help-box" id="helpBox"></div>
+
+      <div id="sourceBox" class="source-box" style="display:none;">
+        <strong>קטע מקור:</strong>
+        <span id="sourceText"></span>
+      </div>
+
       <div id="answersArea"></div>
 
       <div id="openQuestionArea" style="display:none; margin-top:10px;">
         <textarea id="openAnswerInput" rows="5"
-          style="width:100%; border-radius:12px; padding:12px; font-size:16px; font-family:inherit; border:2px solid #cbd5e1; resize:vertical;"
+          style="width:100%; border-radius:12px; padding:12px; font-size:15px; font-family:inherit; border:2px solid #cbd5e1; resize:vertical;"
           placeholder="הקלד/י את תשובתך המלאה כאן..."></textarea>
 
         <button id="showAnswerBtn" class="primary"
-          style="width:100%; padding:14px; margin-top:12px; border-radius:12px; font-size:16px; background:#4f46e5; color:#fff; border:none; cursor:pointer;"
+          style="width:100%; padding:13px; margin-top:10px; border-radius:12px; font-size:15px; background:#4f46e5; color:#fff; border:none; cursor:pointer; font-family:inherit; font-weight:600;"
           onclick="showOpenAnswer()">הצג תשובה אידיאלית לבדיקה</button>
 
         <div id="idealAnswerBox"
-          style="display:none; margin-top:16px; background:#dcfce7; padding:16px; border-radius:12px; border:1px solid #22c55e;">
+          style="display:none; margin-top:14px; background:#dcfce7; padding:14px; border-radius:12px; border:1px solid #22c55e;">
           <div style="font-weight:bold; color:#166534; margin-bottom:8px;">תשובה מעולה:</div>
-          <div id="idealAnswerText" style="white-space:pre-wrap; color:#14532d; font-size:15px; line-height:1.5;"></div>
-
-          <div style="margin-top:16px; text-align:center; font-weight:bold; color:#1e1b4b;">האם ענית נכון?</div>
+          <div id="idealAnswerText" style="white-space:pre-wrap; color:#14532d; font-size:14px; line-height:1.5;"></div>
+          <div style="margin-top:14px; text-align:center; font-weight:bold; color:#1e1b4b; font-size:14px;">האם ענית
+            נכון?</div>
           <div style="display:flex; gap:10px; margin-top:8px;">
             <button onclick="gradeOpenAnswer(true)"
-              style="flex:1; background:#22c55e; color:#fff; border:none; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:15px; transition:0.2s;">✓
-              עניתי קרוב מאוד</button>
+              style="flex:1; background:#22c55e; color:#fff; border:none; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:14px; font-family:inherit; transition:0.2s;">עניתי
+              נכון</button>
             <button onclick="gradeOpenAnswer(false)"
-              style="flex:1; background:#ef4444; color:#fff; border:none; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:15px; transition:0.2s;">✗
-              לא מספיק מדויק</button>
+              style="flex:1; background:#ef4444; color:#fff; border:none; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:14px; font-family:inherit; transition:0.2s;">לא
+              מדויק</button>
           </div>
         </div>
       </div>
+
+      <div id="simSelectArea" style="display:none;"></div>
     </div>
   </div>
 
   <!-- Glossary Modal -->
   <div class="modal-overlay" id="glossaryModal">
     <div class="modal">
-      <button class="close-modal" aria-label="סגור" onclick="closeModal('glossaryModal')">&times;</button>
+      <button class="close-modal" onclick="closeModal('glossaryModal')">&times;</button>
       <h2>מילון מושגים</h2>
-      <div id="glossaryContent">
-        <div class="glossary-item">
-          <div class="glossary-term">דמוקרטיה</div>שלטון העם. שיטה שבה האזרחים בוחרים את נציגיהם, וישנה שמירה על זכויות
-          אדם.
-        </div>
-        <div class="glossary-item">
-          <div class="glossary-term">שלטון החוק</div>העיקרון לפיו כולם שווים בפני החוק.
-        </div>
-        <div class="glossary-item">
-          <div class="glossary-term">זכויות אדם</div>זכויות בסיסיות המגיעות לכל אדם.
-        </div>
-        <div class="glossary-item">
-          <div class="glossary-term">זכויות אזרח</div>זכויות הניתנות רק לאזרחי המדינה.
-        </div>
-        <div class="glossary-item">
-          <div class="glossary-term">הפרדת רשויות</div>פיצול הכוח השלטוני כדי למנוע עריצות.
-        </div>
-        <div class="glossary-item">
-          <div class="glossary-term">פלורליזם</div>הכרה בקיומן של דעות וקבוצות שונות.
-        </div>
-        <div class="glossary-item">
-          <div class="glossary-term">מדינת לאום</div>מדינה שמזוהה עם לאום מסוים ומעניקה לו ביטוי חוקי.
-        </div>
-        <div class="glossary-item">
-          <div class="glossary-term">מיעוט</div>קבוצה באוכלוסייה שאינה הרוב, השונה מהרוב בדת סמלים או שייכות אתנית.
-        </div>
-      </div>
+      <input type="text" class="glossary-search" id="glossarySearch" placeholder="חיפוש מושג..."
+        oninput="filterGlossary()">
+      <div id="glossaryContent"></div>
     </div>
   </div>
 
   <!-- Stats Modal -->
   <div class="modal-overlay" id="statsModal">
     <div class="modal">
-      <button class="close-modal" aria-label="סגור" onclick="closeModal('statsModal')">&times;</button>
-      <h2>סטטיסטיקת המשתמש</h2>
+      <button class="close-modal" onclick="closeModal('statsModal')">&times;</button>
+      <h2>נתונים וסטטיסטיקה</h2>
       <div id="statsContent"></div>
-      <div style="margin-top: 20px; text-align:center;">
-        <button class="primary" style="padding: 10px 20px; border-radius: 8px; border: none; cursor:pointer;"
+      <div style="margin-top: 16px; text-align:center;">
+        <button class="primary"
+          style="padding: 10px 20px; border-radius: 8px; border: none; cursor:pointer; font-family:inherit; font-weight:600;"
           onclick="closeModal('statsModal')">סגור</button>
       </div>
     </div>
   </div>
 
-  <!-- QUESTIONS loaded from separate file to avoid encoding corruption -->
+  <!-- Memory Game Modal -->
+  <div class="modal-overlay" id="memoryModal">
+    <div class="modal memory-modal">
+      <button class="close-modal" onclick="closeModal('memoryModal')">&times;</button>
+      <h2>משחק זיכרון – מושגי אזרחות</h2>
+      <p class="memory-info">מצא התאמה בין מושג להסבר שלו</p>
+      <div class="memory-score" id="memoryScore"></div>
+      <div class="memory-grid" id="memoryGrid"></div>
+      <div class="memory-controls">
+        <button style="background:#4f46e5; color:#fff;" onclick="startNewMemoryRound()">סיבוב חדש</button>
+        <button style="background:#e5e7eb; color:#374151;" onclick="closeModal('memoryModal')">סגור</button>
+      </div>
+    </div>
+  </div>
+
   <script src="questions.js"></script>
+  <script src="open-questions.js"></script>
 
   <script>
-    // --- OPEN QUESTIONS (Stage 2) ---
-    const OPEN_QUESTIONS = [
-      {
-        question: "\u05d4\u05e6\u05d2 \u05d0\u05ea \u05d4\u05d6\u05db\u05d5\u05ea \u05dc\u05d7\u05d5\u05e4\u05e9 \u05d4\u05d1\u05d9\u05d8\u05d5\u05d9, \u05d5\u05d4\u05e1\u05d1\u05e8 \u05de\u05e7\u05e8\u05d4 \u05d0\u05d7\u05d3 \u05e9\u05d1\u05d5 \u05de\u05d5\u05e6\u05d3\u05e7 \u05dc\u05d4\u05d2\u05d1\u05d9\u05dc \u05d6\u05db\u05d5\u05ea \u05d6\u05d5.",
-        idealAnswer: "\u05d7\u05d5\u05e4\u05e9 \u05d4\u05d1\u05d9\u05d8\u05d5\u05d9 \u05d4\u05d5\u05d0 \u05d6\u05db\u05d5\u05ea\u05d5 \u05e9\u05dc \u05db\u05dc \u05d0\u05d3\u05dd \u05dc\u05d4\u05d1\u05d9\u05e2 \u05d0\u05ea \u05d3\u05e2\u05ea\u05d5, \u05d0\u05de\u05d5\u05e0\u05ea\u05d5 \u05d5\u05d4\u05e9\u05e7\u05e4\u05ea \u05e2\u05d5\u05dc\u05de\u05d5, \u05d1\u05db\u05dc \u05d3\u05e8\u05da (\u05d1\u05db\u05ea\u05d1, \u05d1\u05e2\u05dc \u05e4\u05d4, \u05d1\u05d0\u05de\u05e0\u05d5\u05ea \u05d5\u05db\u05d5') \u05d1\u05d0\u05d5\u05e4\u05df \u05e4\u05d5\u05de\u05d1\u05d9 \u05d5\u05d2\u05dc\u05d5\u05d9.\n\u05de\u05d5\u05e6\u05d3\u05e7 \u05dc\u05d4\u05d2\u05d1\u05d9\u05dc \u05d0\u05ea \u05d7\u05d5\u05e4\u05e9 \u05d4\u05d1\u05d9\u05d8\u05d5\u05d9 \u05db\u05d0\u05e9\u05e8 \u05e7\u05d9\u05d9\u05de\u05ea \u05d4\u05ea\u05e0\u05d2\u05e9\u05d5\u05ea \u05e2\u05dd \u05d6\u05db\u05d5\u05ea \u05d0\u05d7\u05e8\u05ea \u05d0\u05d5 \u05e2\u05dd \u05d0\u05d9\u05e0\u05d8\u05e8\u05e1 \u05e6\u05d9\u05d1\u05d5\u05e8\u05d9 - \u05dc\u05de\u05e9\u05dc \u05db\u05d0\u05e9\u05e8 \u05d4\u05d1\u05d9\u05d8\u05d5\u05d9 \u05de\u05d4\u05d5\u05d5\u05d4 \u05d4\u05e1\u05ea\u05d4 \u05dc\u05d0\u05dc\u05d9\u05de\u05d5\u05ea (\u05d4\u05ea\u05e0\u05d2\u05e9\u05d5\u05ea \u05e2\u05dd \u05d4\u05d6\u05db\u05d5\u05ea \u05dc\u05d7\u05d9\u05d9\u05dd \u05d5\u05d1\u05d9\u05d8\u05d7\u05d5\u05df) \u05d0\u05d5 \u05e9\u05d9\u05d9\u05de\u05d9\u05e0\u05d2 \u05d5\u05dc\u05e9\u05d5\u05df \u05d4\u05e8\u05e2 (\u05d4\u05ea\u05e0\u05d2\u05e9\u05d5\u05ea \u05e2\u05dd \u05d4\u05d6\u05db\u05d5\u05ea \u05dc\u05e9\u05dd \u05d8\u05d5\u05d1)."
-      },
-      {
-        question: "\u05d4\u05e1\u05d1\u05e8 \u05de\u05d4\u05d5 '\u05e2\u05e7\u05e8\u05d5\u05df \u05e9\u05dc\u05d8\u05d5\u05df \u05d4\u05d7\u05d5\u05e7', \u05d5\u05d4\u05e6\u05d2 \u05d0\u05ea \u05d4\u05d4\u05d1\u05d3\u05dc \u05d1\u05d9\u05df \u05e2\u05d1\u05e8\u05d9\u05d9\u05e0\u05d5\u05ea \u05e4\u05dc\u05d9\u05dc\u05d9\u05ea \u05e8\u05d2\u05d9\u05dc\u05d4 \u05dc\u05e2\u05d1\u05e8\u05d9\u05d9\u05e0\u05d5\u05ea \u05d0\u05d9\u05d3\u05d9\u05d0\u05d5\u05dc\u05d5\u05d2\u05d9\u05ea.",
-        idealAnswer: "\u05e2\u05e7\u05e8\u05d5\u05df \u05e9\u05dc\u05d8\u05d5\u05df \u05d4\u05d7\u05d5\u05e7 \u05e7\u05d5\u05d1\u05e2 \u05e9\u05db\u05dc \u05d4\u05d0\u05d6\u05e8\u05d7\u05d9\u05dd \u05d5\u05d2\u05dd \u05e8\u05e9\u05d5\u05d9\u05d5\u05ea \u05d4\u05e9\u05dc\u05d8\u05d5\u05df \u05db\u05e4\u05d5\u05e4\u05d9\u05dd \u05dc\u05d7\u05d5\u05e7 \u05d1\u05d0\u05d5\u05ea\u05d4 \u05de\u05d9\u05d3\u05d4, \u05d5\u05d4\u05d7\u05d5\u05e7 \u05e0\u05d7\u05e7\u05e7 \u05e2\u05dc \u05d9\u05d3\u05d9 \u05d4\u05e8\u05e9\u05d5\u05ea \u05d4\u05de\u05d7\u05d5\u05e7\u05e7\u05ea \u05de\u05ea\u05d5\u05da \u05d4\u05e1\u05db\u05de\u05d4.\n\u05e2\u05d1\u05e8\u05d9\u05d9\u05e0\u05d5\u05ea \u05e4\u05dc\u05d9\u05dc\u05d9\u05ea \u05e8\u05d2\u05d9\u05dc\u05d4 \u05e0\u05d5\u05d1\u05e2\u05ea \u05de\u05de\u05e0\u05d9\u05e2 \u05d0\u05d9\u05e9\u05d9 (\u05db\u05d2\u05d5\u05df \u05e8\u05e6\u05d5\u05df \u05dc\u05d4\u05ea\u05e2\u05e9\u05e8, \u05d9\u05e6\u05e8 \u05e0\u05e7\u05de\u05d4) \u05d5\u05d4\u05e2\u05d1\u05e8\u05d9\u05d9\u05df \u05e4\u05d5\u05e2\u05dc \u05d1\u05e1\u05ea\u05e8 \u05d5\u05d0\u05d9\u05e0\u05d5 \u05e4\u05d5\u05e2\u05dc \u05dc\u05e9\u05d9\u05e0\u05d5\u05d9 \u05de\u05d3\u05d9\u05e0\u05d9\u05d5\u05ea.\n\u05e2\u05d1\u05e8\u05d9\u05d9\u05e0\u05d5\u05ea \u05d0\u05d9\u05d3\u05d9\u05d0\u05d5\u05dc\u05d5\u05d2\u05d9\u05ea \u05e0\u05d5\u05d1\u05e2\u05ea \u05de\u05de\u05e0\u05d9\u05e2 \u05e4\u05d5\u05dc\u05d9\u05d8\u05d9 \u05d0\u05d5 \u05de\u05d5\u05e1\u05e8\u05d9, \u05e0\u05e2\u05e9\u05d9\u05ea \u05dc\u05e8\u05d5\u05d1 \u05d1\u05d0\u05d5\u05e4\u05df \u05e4\u05d5\u05de\u05d1\u05d9, \u05d1\u05de\u05d8\u05e8\u05d4 \u05dc\u05d4\u05e9\u05e4\u05d9\u05e2 \u05e2\u05dc \u05de\u05e7\u05d1\u05dc\u05d9 \u05d4\u05d4\u05d7\u05dc\u05d8\u05d5\u05ea \u05d5\u05dc\u05e9\u05e0\u05d5\u05ea \u05de\u05d3\u05d9\u05e0\u05d9\u05d5\u05ea \u05d0\u05d5 \u05d7\u05d5\u05e7, \u05de\u05ea\u05d5\u05da \u05d0\u05de\u05d5\u05e0\u05d4 \u05e9\u05d4\u05de\u05d3\u05d9\u05e0\u05d9\u05d5\u05ea \u05d4\u05e0\u05d5\u05db\u05d7\u05d9\u05ea \u05e9\u05d2\u05d5\u05d9\u05d4."
-      },
-      {
-        question: "\u05d4\u05e6\u05d2 \u05e9\u05ea\u05d9 \u05d3\u05e8\u05db\u05d9\u05dd \u05e9\u05d1\u05d4\u05df \u05d4\u05de\u05de\u05e9\u05dc\u05d4 \u05de\u05e4\u05d5\u05e7\u05d7\u05ea \u05e2\u05dc \u05d9\u05d3\u05d9 \u05d4\u05db\u05e0\u05e1\u05ea (\u05de\u05e2\u05e8\u05db\u05ea \u05d1\u05dc\u05de\u05d9\u05dd \u05d5\u05d0\u05d9\u05d6\u05d5\u05e0\u05d9\u05dd).",
-        idealAnswer: "1. \u05d7\u05d5\u05e7 \u05d4\u05ea\u05e7\u05e6\u05d9\u05d1 - \u05d4\u05db\u05e0\u05e1\u05ea \u05de\u05d0\u05e9\u05e8\u05ea \u05d0\u05ea \u05d7\u05d5\u05e7 \u05d4\u05ea\u05e7\u05e6\u05d9\u05d1, \u05d5\u05d1\u05db\u05da \u05de\u05e4\u05e7\u05d7\u05ea \u05e2\u05dc \u05d4\u05d5\u05e6\u05d0\u05d5\u05ea \u05d4\u05de\u05de\u05e9\u05dc\u05d4. \u05dc\u05dc\u05d0 \u05d0\u05d9\u05e9\u05d5\u05e8 \u05ea\u05e7\u05e6\u05d9\u05d1 \u05d4\u05de\u05de\u05e9\u05dc\u05d4 \u05e0\u05d5\u05e4\u05dc\u05ea.\n2. \u05d4\u05e6\u05e2\u05ea \u05d0\u05d9-\u05d0\u05de\u05d5\u05df - \u05d4\u05db\u05e0\u05e1\u05ea \u05d9\u05db\u05d5\u05dc\u05d4 \u05dc\u05d4\u05e4\u05d9\u05dc \u05d0\u05ea \u05d4\u05de\u05de\u05e9\u05dc\u05d4 \u05d1\u05e8\u05d5\u05d1 \u05e7\u05d5\u05dc\u05d5\u05ea \u05d3\u05e8\u05da \u05d4\u05e6\u05e2\u05ea \u05d0\u05d9-\u05d0\u05de\u05d5\u05df \u05d0\u05dd \u05d4\u05de\u05de\u05e9\u05dc\u05d4 \u05de\u05d0\u05d1\u05d3\u05ea \u05d0\u05ea \u05ea\u05de\u05d9\u05db\u05ea \u05d4\u05e4\u05e8\u05dc\u05de\u05e0\u05d8."
-      },
-      {
-        question: "\u05d4\u05e1\u05d1\u05e8 \u05d0\u05ea \u05d4\u05de\u05d5\u05e9\u05d2 '\u05d3\u05de\u05d5\u05e7\u05e8\u05d8\u05d9\u05d4 \u05de\u05ea\u05d2\u05d5\u05e0\u05e0\u05ea' \u05d5\u05d4\u05e6\u05d2 \u05d3\u05d5\u05d2\u05de\u05d4 \u05d0\u05d7\u05ea \u05de\u05d9\u05d9\u05e9\u05d5\u05de\u05d5 \u05d1\u05d9\u05e9\u05e8\u05d0\u05dc.",
-        idealAnswer: "\u05d3\u05de\u05d5\u05e7\u05e8\u05d8\u05d9\u05d4 \u05de\u05ea\u05d2\u05d5\u05e0\u05e0\u05ea \u05d4\u05d9\u05d0 \u05d6\u05db\u05d5\u05ea\u05d4 \u05e9\u05dc \u05de\u05d3\u05d9\u05e0\u05d4 \u05d3\u05de\u05d5\u05e7\u05e8\u05d8\u05d9\u05ea \u05dc\u05e4\u05e2\u05d5\u05dc \u05d1\u05d7\u05e8\u05d9\u05e4\u05d5\u05ea (\u05ea\u05d5\u05da \u05e4\u05d2\u05d9\u05e2\u05d4 \u05d1\u05d6\u05db\u05d5\u05d9\u05d5\u05ea \u05de\u05e1\u05d5\u05d9\u05de\u05d5\u05ea) \u05db\u05d3\u05d9 \u05dc\u05d4\u05ea\u05d2\u05d5\u05e0\u05df \u05de\u05e4\u05e0\u05d9 \u05e7\u05d1\u05d5\u05e6\u05d5\u05ea (\u05de\u05d5\u05e1\u05d3\u05d5\u05ea \u05d0\u05d5 \u05d9\u05d7\u05d9\u05d3\u05d9\u05dd) \u05d4\u05de\u05e0\u05e6\u05dc\u05d9\u05dd \u05d0\u05ea \u05d4\u05db\u05dc\u05d9\u05dd \u05d4\u05d3\u05de\u05d5\u05e7\u05e8\u05d8\u05d9\u05d9\u05dd (\u05db\u05de\u05d5 \u05d7\u05d5\u05e4\u05e9 \u05d4\u05d4\u05ea\u05d0\u05d2\u05d3\u05d5\u05ea \u05d5\u05d4\u05d1\u05d9\u05d8\u05d5\u05d9) \u05db\u05d3\u05d9 \u05dc\u05e4\u05d2\u05d5\u05e2 \u05d1\u05e2\u05e6\u05dd \u05e7\u05d9\u05d5\u05de\u05d4 \u05e9\u05dc \u05d4\u05de\u05d3\u05d9\u05e0\u05d4 \u05db\u05d3\u05de\u05d5\u05e7\u05e8\u05d8\u05d9\u05ea \u05d0\u05d5 \u05d9\u05d4\u05d5\u05d3\u05d9\u05ea.\n\u05d3\u05d5\u05d2\u05de\u05d4 \u05d1\u05d9\u05e9\u05e8\u05d0\u05dc: '\u05d7\u05d5\u05e7 \u05d9\u05e1\u05d5\u05d3 \u05d4\u05db\u05e0\u05e1\u05ea (\u05e1\u05e2\u05d9\u05e3 7\u05d0)' \u05d4\u05de\u05d0\u05e4\u05e9\u05e8 \u05e4\u05e1\u05d9\u05dc\u05ea \u05e8\u05e9\u05d9\u05de\u05d4 \u05de\u05dc\u05d4\u05ea\u05de\u05d5\u05d3\u05d3 \u05d1\u05d1\u05d7\u05d9\u05e8\u05d5\u05ea \u05d0\u05dd \u05de\u05d8\u05e8\u05ea\u05d4 \u05d4\u05d9\u05d0 \u05e9\u05dc\u05d9\u05dc\u05ea \u05e7\u05d9\u05d5\u05de\u05d4 \u05e9\u05dc \u05d9\u05e9\u05e8\u05d0\u05dc \u05db\u05de\u05d3\u05d9\u05e0\u05d4 \u05d9\u05d4\u05d5\u05d3\u05d9\u05ea \u05d5\u05d3\u05de\u05d5\u05e7\u05e8\u05d8\u05d9\u05ea, \u05d0\u05d5 \u05ea\u05de\u05d9\u05db\u05d4 \u05d1\u05de\u05d0\u05d1\u05e7 \u05de\u05d6\u05d5\u05d9\u05df \u05e0\u05d2\u05d3\u05d4."
-      }
-    ];
-
-    // --- STATE ---
+    // ─── STATE ───
     var mode = "all";
     var shuffled = true;
     var list = [];
     var idx = 0;
     var correct = 0;
     var wrong = 0;
-    var isStage2 = false;
+    var currentStage = 1; // 1-4
     var currentOpenQ = null;
+    var currentSimulation = null;
 
-    // Audio context
     var C = new (window.AudioContext || window.webkitAudioContext)();
     var muted = false;
 
-    // Persisted State
     var mistakes = new Set(JSON.parse(localStorage.getItem("civics_mistakes") || "[]"));
     var successes = new Set(JSON.parse(localStorage.getItem("civics_successes") || "[]"));
-    var civics_stats = JSON.parse(localStorage.getItem("civics_stats") || '{"examsPassed":0, "openCorrect":0, "openWrong":0}');
+    var civics_stats = JSON.parse(localStorage.getItem("civics_stats") || '{"examsPassed":0,"openCorrect":0,"openWrong":0,"stage3Correct":0,"stage3Wrong":0,"simCompleted":[]}');
     if (!civics_stats.openCorrect) civics_stats.openCorrect = 0;
     if (!civics_stats.openWrong) civics_stats.openWrong = 0;
+    if (!civics_stats.stage3Correct) civics_stats.stage3Correct = 0;
+    if (!civics_stats.stage3Wrong) civics_stats.stage3Wrong = 0;
+    if (!civics_stats.simCompleted) civics_stats.simCompleted = [];
 
-    function updateStage2UnlockUI() {
-      var stage2Btn = document.getElementById("stage2Btn");
-      var stageLabel = document.getElementById("stageLabel");
-      stage2Btn.style.display = "inline-flex";
-      if (isStage2) stageLabel.style.display = "inline-block";
-      else stageLabel.style.display = "none";
+    // ─── STAGE UNLOCK LOGIC ───
+    function isStageUnlocked(s) {
+      if (s === 1) return true;
+      if (s === 2) return civics_stats.examsPassed >= 3;
+      if (s === 3) return civics_stats.openCorrect >= 5;
+      if (s === 4) return civics_stats.stage3Correct >= 5;
+      return false;
     }
 
+    function updateRoadmap() {
+      var cards = document.querySelectorAll(".stage-card");
+      cards.forEach(function (card) {
+        var s = parseInt(card.getAttribute("data-stage"));
+        card.classList.remove("active", "unlocked", "locked");
+        if (s === currentStage) {
+          card.classList.add("active");
+        } else if (isStageUnlocked(s)) {
+          card.classList.add("unlocked");
+        } else {
+          card.classList.add("locked");
+        }
+        // Show/hide lock icon
+        var lockEl = card.querySelector(".lock-icon");
+        if (lockEl) lockEl.style.display = isStageUnlocked(s) ? "none" : "block";
+      });
+      buildStageControls();
+    }
+
+    function handleStageClick(s) {
+      if (!isStageUnlocked(s)) return; // locked, do nothing
+      currentStage = s;
+      updateRoadmap();
+      // Auto-start the stage
+      if (s === 1) startAll(true);
+      else if (s === 2) startStage2();
+      else if (s === 3) startStage3();
+      else if (s === 4) openSimSelect();
+    }
+
+    // ─── DYNAMIC CONTROLS PER STAGE ───
+    function buildStageControls() {
+      var c = document.getElementById("stageControls");
+      var html = "";
+      if (currentStage === 1) {
+        html += '<button class="exam" onclick="startExam()">מבחן שלב 1</button>';
+        html += '<button class="primary" onclick="startAll(true)">תרגול אקראי</button>';
+        html += '<button class="primary" onclick="startAll(false)" style="background:#6366f1 !important;">תרגול לפי סדר</button>';
+        html += '<button style="background:#f59e0b !important; color:#fff;" onclick="startMistakes()">חזרה על טעויות</button>';
+        html += '<button style="background:#22c55e !important; color:#fff;" onclick="startSuccesses()">חזרה על הצלחות</button>';
+      } else if (currentStage === 2) {
+        html += '<button class="primary" style="background:#d97706 !important;" onclick="startStage2()">התחל תרגול שלב 2</button>';
+      } else if (currentStage === 3) {
+        html += '<button class="primary" style="background:#7c3aed !important;" onclick="startStage3()">התחל תרגול שלב 3</button>';
+      } else if (currentStage === 4) {
+        html += '<button class="primary" style="background:#dc2626 !important;" onclick="openSimSelect()">בחר סימולציה</button>';
+      }
+      html += '<button class="warn" onclick="resetAll()">איפוס התקדמות</button>';
+      c.innerHTML = html;
+
+      // Show/hide topic filter (only stage 1)
+      document.getElementById("topicFilter").style.display = (currentStage === 1) ? "block" : "none";
+    }
+
+    // ─── GLOSSARY ───
+    function buildGlossary() {
+      var html = "";
+      GLOSSARY_DATA.forEach(function (g) {
+        html += '<div class="glossary-item" data-term="' + g.term + '"><div class="glossary-term">' + g.term + '</div>' + g.definition + '</div>';
+      });
+      document.getElementById("glossaryContent").innerHTML = html;
+    }
+
+    function filterGlossary() {
+      var q = document.getElementById("glossarySearch").value.toLowerCase();
+      var items = document.querySelectorAll(".glossary-item");
+      items.forEach(function (item) {
+        var text = item.textContent.toLowerCase();
+        item.style.display = (q === "" || text.indexOf(q) !== -1) ? "block" : "none";
+      });
+    }
+
+    // ─── SOUND ───
     function beep(f, t, vol) {
       if (muted) return;
       if (C.state === "suspended") C.resume();
@@ -555,10 +971,7 @@
     }
     function playCorrect() { beep(600, 0.2, 0.2); setTimeout(function () { beep(800, 0.3, 0.2); }, 100); }
     function playWrong() { beep(300, 0.4, 0.3); setTimeout(function () { beep(250, 0.4, 0.3); }, 150); }
-    function toggleMute() {
-      muted = !muted;
-      document.getElementById("muteBtn").textContent = muted ? "\uD83D\uDD07" : "\uD83D\uDD0A";
-    }
+    function toggleMute() { muted = !muted; document.getElementById("muteBtn").textContent = muted ? "השתק" : "צליל"; }
 
     function toggleHelp() {
       var box = document.getElementById("helpBox");
@@ -583,100 +996,128 @@
     function setModeLabel(txt) { document.getElementById("modeLabel").textContent = txt; }
     function topicChanged() { startAll(true); }
 
-    function getTopicLabel() {
-      var topic = document.getElementById("topicFilter").value;
-      if (topic === "all") return "";
-      var opt = document.getElementById("topicFilter").selectedOptions[0];
-      return " (" + opt.textContent.split(":")[0].trim() + ")";
-    }
-
     function getFilteredBase() {
       var topic = document.getElementById("topicFilter").value;
       if (topic === "all") return QUESTIONS;
       return QUESTIONS.filter(function (q) { return q.topicId == topic; });
     }
 
-    function startAll(doShuffle) {
-      isStage2 = false; updateStage2UnlockUI();
+    function hideAllAreas() {
       document.getElementById("openQuestionArea").style.display = "none";
+      document.getElementById("answersArea").style.display = "none";
+      document.getElementById("simSelectArea").style.display = "none";
+      document.getElementById("sourceBox").style.display = "none";
+    }
+
+    // ─── STAGE 1 ───
+    function startAll(doShuffle) {
+      currentStage = 1; updateRoadmap(); hideAllAreas();
       document.getElementById("answersArea").style.display = "block";
       mode = "all"; shuffled = doShuffle;
-      var baseQuestions = getFilteredBase();
-      list = doShuffle ? shuffleArray(baseQuestions) : baseQuestions.slice();
+      var baseQ = getFilteredBase();
+      list = doShuffle ? shuffleArray(baseQ) : baseQ.slice();
       idx = 0; correct = 0; wrong = 0;
-      setModeLabel((doShuffle ? "\u05ea\u05e8\u05d2\u05d5\u05dc \u05d0\u05e7\u05e8\u05d0\u05d9" : "\u05ea\u05e8\u05d2\u05d5\u05dc \u05dc\u05e4\u05d9 \u05e1\u05d3\u05e8") + getTopicLabel());
-      initCounters();
-      render();
+      setModeLabel(doShuffle ? "תרגול אקראי" : "תרגול לפי סדר");
+      initCounters(); render();
     }
 
     function startMistakes() {
-      isStage2 = false; updateStage2UnlockUI();
-      document.getElementById("openQuestionArea").style.display = "none";
+      currentStage = 1; updateRoadmap(); hideAllAreas();
       document.getElementById("answersArea").style.display = "block";
-      mode = "mistakes"; shuffled = true;
-      var base = getFilteredBase();
-      var arr = base.filter(function (q) { return mistakes.has(q.id); });
-      if (!arr.length) { alert("\u05d0\u05d9\u05df \u05d8\u05e2\u05d5\u05d9\u05d5\u05ea \u05e9\u05de\u05d5\u05e8\u05d5\u05ea" + (getTopicLabel() ? " \u05d1\u05e0\u05d5\u05e9\u05d0 \u05d6\u05d4" : "") + "."); return; }
+      mode = "mistakes";
+      var arr = getFilteredBase().filter(function (q) { return mistakes.has(q.id); });
+      if (!arr.length) { alert("אין טעויות שמורות."); return; }
       list = shuffleArray(arr);
       idx = 0; correct = 0; wrong = 0;
-      setModeLabel("\u05d7\u05d6\u05e8\u05ea \u05d8\u05e2\u05d5\u05d9\u05d5\u05ea" + getTopicLabel());
-      initCounters();
-      render();
+      setModeLabel("חזרה על טעויות");
+      initCounters(); render();
     }
 
     function startSuccesses() {
-      isStage2 = false; updateStage2UnlockUI();
-      document.getElementById("openQuestionArea").style.display = "none";
+      currentStage = 1; updateRoadmap(); hideAllAreas();
       document.getElementById("answersArea").style.display = "block";
-      mode = "successes"; shuffled = true;
-      var base = getFilteredBase();
-      var arr = base.filter(function (q) { return successes.has(q.id); });
-      if (!arr.length) { alert("\u05d0\u05d9\u05df \u05d4\u05e6\u05dc\u05d7\u05d5\u05ea \u05e9\u05de\u05d5\u05e8\u05d5\u05ea" + (getTopicLabel() ? " \u05d1\u05e0\u05d5\u05e9\u05d0 \u05d6\u05d4" : "") + "."); return; }
+      mode = "successes";
+      var arr = getFilteredBase().filter(function (q) { return successes.has(q.id); });
+      if (!arr.length) { alert("אין הצלחות שמורות."); return; }
       list = shuffleArray(arr);
       idx = 0; correct = 0; wrong = 0;
-      setModeLabel("\u05d7\u05d6\u05e8\u05ea \u05d4\u05e6\u05dc\u05d7\u05d5\u05ea" + getTopicLabel());
-      initCounters();
-      render();
+      setModeLabel("חזרה על הצלחות");
+      initCounters(); render();
     }
 
     function startExam() {
-      isStage2 = false; updateStage2UnlockUI();
-      document.getElementById("openQuestionArea").style.display = "none";
+      currentStage = 1; updateRoadmap(); hideAllAreas();
       document.getElementById("answersArea").style.display = "block";
       mode = "exam";
       list = shuffleArray(QUESTIONS).slice(0, 70);
       idx = 0; correct = 0; wrong = 0;
-      setModeLabel("\u05de\u05d1\u05d7\u05df \u05e9\u05dc\u05d1 1");
-      initCounters();
-      render();
+      setModeLabel("מבחן שלב 1");
+      initCounters(); render();
     }
 
+    // ─── STAGE 2 ───
     function startStage2() {
-      isStage2 = true; updateStage2UnlockUI();
+      currentStage = 2; updateRoadmap(); hideAllAreas();
       document.getElementById("openQuestionArea").style.display = "block";
-      document.getElementById("answersArea").style.display = "none";
       mode = "stage2";
       list = shuffleArray(OPEN_QUESTIONS);
       idx = 0; correct = 0; wrong = 0;
-      setModeLabel("\u05ea\u05e8\u05d2\u05d5\u05dc \u05e9\u05dc\u05d1 2");
-      initCounters();
-      render();
+      setModeLabel("תרגול שלב 2");
+      initCounters(); render();
     }
 
-    function devSkip() {
-      civics_stats.examsPassed = 3;
-      saveSets();
-      updateStage2UnlockUI();
-      startStage2();
+    // ─── STAGE 3 ───
+    function startStage3() {
+      currentStage = 3; updateRoadmap(); hideAllAreas();
+      document.getElementById("openQuestionArea").style.display = "block";
+      mode = "stage3";
+      list = shuffleArray(STAGE3_QUESTIONS);
+      idx = 0; correct = 0; wrong = 0;
+      setModeLabel("תרגול שלב 3");
+      initCounters(); render();
+    }
+
+    // ─── STAGE 4 ───
+    function openSimSelect() {
+      currentStage = 4; updateRoadmap(); hideAllAreas();
+      document.getElementById("simSelectArea").style.display = "block";
+      document.getElementById("topicSubtitle").textContent = "בחר סימולציה";
+      document.getElementById("questionText").textContent = "";
+      document.getElementById("helpBtn").style.display = "none";
+      document.getElementById("helpBox").style.display = "none";
+
+      var html = "";
+      SIMULATIONS.forEach(function (sim, i) {
+        var done = civics_stats.simCompleted.indexOf(i) !== -1;
+        html += '<button class="sim-select-btn" onclick="startSimulation(' + i + ')">' +
+          (done ? "V " : "") + sim.title +
+          ' (' + sim.questions.length + ' שאלות)' +
+          (done ? ' - הושלם' : '') + '</button>';
+      });
+      document.getElementById("simSelectArea").innerHTML = html;
+      document.getElementById("progressBar").style.width = "0%";
+      document.getElementById("qnum").textContent = "0";
+      document.getElementById("qtotal").textContent = "0";
+    }
+
+    function startSimulation(simIdx) {
+      currentSimulation = simIdx;
+      hideAllAreas();
+      document.getElementById("openQuestionArea").style.display = "block";
+      mode = "stage4";
+      list = SIMULATIONS[simIdx].questions;
+      idx = 0; correct = 0; wrong = 0;
+      setModeLabel(SIMULATIONS[simIdx].title);
+      initCounters(); render();
     }
 
     function resetAll() {
-      if (!confirm("\u05d4\u05d0\u05dd \u05dc\u05d0\u05e4\u05e1 \u05d0\u05ea \u05db\u05dc \u05d4\u05e0\u05ea\u05d5\u05e0\u05d9\u05dd, \u05d4\u05e1\u05d8\u05d8\u05d9\u05e1\u05d8\u05d9\u05e7\u05d5\u05ea \u05d5\u05d4\u05d4\u05e6\u05dc\u05d7\u05d5\u05ea?")) return;
-      mistakes.clear();
-      successes.clear();
-      civics_stats = { examsPassed: 0, openCorrect: 0, openWrong: 0 };
+      if (!confirm("האם לאפס את כל הנתונים, הסטטיסטיקות וההצלחות?")) return;
+      mistakes.clear(); successes.clear();
+      civics_stats = { examsPassed: 0, openCorrect: 0, openWrong: 0, stage3Correct: 0, stage3Wrong: 0, simCompleted: [] };
       saveSets();
-      updateStage2UnlockUI();
+      currentStage = 1;
+      updateRoadmap();
       document.getElementById("topicFilter").value = "all";
       startAll(true);
     }
@@ -687,21 +1128,27 @@
       document.getElementById("wrong").textContent = wrong;
     }
 
+    // ─── RENDER ───
     function render() {
-      if (idx >= list.length) {
-        finishSequence();
-        return;
-      }
+      if (idx >= list.length) { finishSequence(); return; }
       var q = list[idx];
       document.getElementById("qnum").textContent = (idx + 1);
       document.getElementById("progressBar").style.width = ((idx / list.length) * 100) + "%";
-      document.getElementById("questionText").textContent = q.question;
-      document.getElementById("topicSubtitle").textContent = q.topic || "";
       document.getElementById("helpBox").style.display = "none";
-      document.getElementById("helpBox").textContent = q.explanation || "";
-      document.getElementById("helpBtn").style.display = q.explanation ? "flex" : "none";
 
-      if (!isStage2) {
+      if (q.isSource) {
+        document.getElementById("sourceBox").style.display = "block";
+        document.getElementById("sourceText").textContent = q.sourceText;
+      } else {
+        document.getElementById("sourceBox").style.display = "none";
+      }
+
+      if (currentStage === 1) {
+        document.getElementById("questionText").textContent = q.question;
+        document.getElementById("topicSubtitle").textContent = q.topic || "";
+        document.getElementById("helpBox").textContent = q.explanation || "";
+        document.getElementById("helpBtn").style.display = q.explanation ? "flex" : "none";
+
         var answersArea = document.getElementById("answersArea");
         answersArea.innerHTML = "";
         var built = q.answers.map(function (t, i) { return { text: t, isCorrect: i === q.correctIndex }; });
@@ -714,6 +1161,12 @@
           answersArea.appendChild(btn);
         });
       } else {
+        document.getElementById("questionText").textContent = q.question;
+        var subtitle = q.topic || "";
+        if (currentStage === 3) subtitle = "שלב 3 – תרגול בגרות";
+        if (currentStage === 4) subtitle = SIMULATIONS[currentSimulation].title;
+        document.getElementById("topicSubtitle").textContent = subtitle;
+        document.getElementById("helpBtn").style.display = "none";
         currentOpenQ = q;
         document.getElementById("openAnswerInput").value = "";
         document.getElementById("idealAnswerBox").style.display = "none";
@@ -723,29 +1176,39 @@
 
     function finishSequence() {
       var percent = Math.round((correct / Math.max(1, list.length)) * 100);
-      document.getElementById("questionText").innerHTML = "\u05e1\u05d9\u05d5\u05dd \u05ea\u05e8\u05d2\u05d5\u05dc \uD83C\uDF89";
+      document.getElementById("questionText").textContent = "סיום תרגול";
       document.getElementById("progressBar").style.width = "100%";
       document.getElementById("helpBox").style.display = "none";
       document.getElementById("helpBtn").style.display = "none";
+      document.getElementById("sourceBox").style.display = "none";
 
       if (mode === "exam") {
         if (percent >= 90) {
           civics_stats.examsPassed++;
           saveSets();
-          document.getElementById("answersArea").innerHTML = '<div class="small" style="font-size:20px; color:#16a34a;"><b>\u05de\u05d1\u05d7\u05df \u05e2\u05d5\u05d1\u05e8! \u05e6\u05d9\u05d5\u05df: ' + percent + '%</b><br>\u05db\u05dc \u05d4\u05db\u05d1\u05d5\u05d3! \u05e2\u05d1\u05e8\u05ea ' + civics_stats.examsPassed + ' \u05de\u05d1\u05d7\u05e0\u05d9\u05dd.</div>';
+          document.getElementById("answersArea").innerHTML = '<div class="small" style="font-size:18px; color:#16a34a;"><b>מבחן עובר! ציון: ' + percent + '%</b><br>עברת ' + civics_stats.examsPassed + ' מבחנים.</div>';
           if (civics_stats.examsPassed === 3) {
-            document.getElementById("answersArea").innerHTML += '<div style="margin-top:20px; font-weight:bold; color:#b45309; font-size:22px;">\uD83C\uDF89 \u05e9\u05dc\u05d1 2 (\u05e9\u05d0\u05dc\u05d5\u05ea \u05e4\u05ea\u05d5\u05d7\u05d5\u05ea) \u05d4\u05d5\u05e4\u05e2\u05dc \u05d1\u05d4\u05e6\u05dc\u05d7\u05d4! \uD83C\uDF89</div>';
-            updateStage2UnlockUI();
+            document.getElementById("answersArea").innerHTML += '<div style="margin-top:16px; font-weight:bold; color:#d97706; font-size:18px;">שלב 2 נפתח בהצלחה!</div>';
           }
         } else {
-          document.getElementById("answersArea").innerHTML = '<div class="small" style="font-size:20px; color:#dc2626;"><b>\u05e0\u05db\u05e9\u05dc\u05ea \u05d1\u05de\u05d1\u05d7\u05df. \u05e6\u05d9\u05d5\u05df: ' + percent + '%</b><br>\u05e0\u05d3\u05e8\u05e9 90% \u05db\u05d3\u05d9 \u05dc\u05e2\u05d1\u05d5\u05e8.</div>';
+          document.getElementById("answersArea").innerHTML = '<div class="small" style="font-size:18px; color:#dc2626;"><b>נכשלת במבחן. ציון: ' + percent + '%</b><br>נדרש 90% כדי לעבור.</div>';
         }
+      } else if (mode === "stage4") {
+        if (civics_stats.simCompleted.indexOf(currentSimulation) === -1) {
+          civics_stats.simCompleted.push(currentSimulation);
+          saveSets();
+        }
+        document.getElementById("openQuestionArea").style.display = "none";
+        document.getElementById("answersArea").style.display = "block";
+        document.getElementById("answersArea").innerHTML = '<div class="small" style="font-size:18px;"><b>סימולציה הושלמה!</b><br>ציון: <b>' + percent + '%</b> | נכון: ' + correct + ' | שגוי: ' + wrong + '</div>';
       } else {
-        document.getElementById("answersArea").innerHTML = '<div class="small">\u05e6\u05d9\u05d5\u05df: <b>' + percent + '%</b> \u00b7 \u05e0\u05db\u05d5\u05df: ' + correct + ' \u00b7 \u05e9\u05d2\u05d5\u05d9: ' + wrong + '</div>';
-        if (isStage2) {
+        if (currentStage !== 1) {
           document.getElementById("openQuestionArea").style.display = "none";
+          document.getElementById("answersArea").style.display = "block";
         }
+        document.getElementById("answersArea").innerHTML = '<div class="small" style="font-size:16px;">ציון: <b>' + percent + '%</b> | נכון: ' + correct + ' | שגוי: ' + wrong + '</div>';
       }
+      updateRoadmap();
     }
 
     function choose(btn, isCorrect, shown, q) {
@@ -753,19 +1216,13 @@
       if (buttons.some(function (b) { return b.classList.contains("correct") || b.classList.contains("wrong"); })) return;
 
       if (isCorrect) {
-        btn.classList.add("correct");
-        correct++;
-        successes.add(q.id);
-        mistakes.delete(q.id);
+        btn.classList.add("correct"); correct++;
+        successes.add(q.id); mistakes.delete(q.id);
         playCorrect();
       } else {
-        btn.classList.add("wrong");
-        wrong++;
-        mistakes.add(q.id);
-        playWrong();
-        buttons.forEach(function (b, i) {
-          if (shown[i].isCorrect) b.classList.add("correct");
-        });
+        btn.classList.add("wrong"); wrong++;
+        mistakes.add(q.id); playWrong();
+        buttons.forEach(function (b, i) { if (shown[i].isCorrect) b.classList.add("correct"); });
       }
       saveSets();
       document.getElementById("correct").textContent = correct;
@@ -782,13 +1239,13 @@
 
     function gradeOpenAnswer(isUserCorrect) {
       if (isUserCorrect) {
-        civics_stats.openCorrect++;
-        correct++;
-        playCorrect();
+        if (currentStage === 3) civics_stats.stage3Correct++;
+        else civics_stats.openCorrect++;
+        correct++; playCorrect();
       } else {
-        civics_stats.openWrong++;
-        wrong++;
-        playWrong();
+        if (currentStage === 3) civics_stats.stage3Wrong++;
+        else civics_stats.openWrong++;
+        wrong++; playWrong();
       }
       saveSets();
       document.getElementById("correct").textContent = correct;
@@ -796,28 +1253,108 @@
       setTimeout(function () { idx++; render(); }, 800);
     }
 
+    // ─── MODALS ───
     function openModal(id) { document.getElementById(id).style.display = "flex"; }
     function closeModal(id) { document.getElementById(id).style.display = "none"; }
 
     function openStats() {
       var ts = civics_stats;
-      var html = '<div class="stat-row"><span>\u05de\u05d1\u05d7\u05e0\u05d9\u05dd \u05e9\u05e2\u05d1\u05e8\u05ea \u05d1\u05d4\u05e6\u05dc\u05d7\u05d4 (90%+):</span> <span class="stat-val">' + ts.examsPassed + '</span></div>';
-      html += '<div class="stat-row" style="color:#d97706; font-weight:bold;"><span>\u05e9\u05d0\u05dc\u05d5\u05ea \u05e4\u05ea\u05d5\u05d7\u05d5\u05ea (\u05e9\u05dc\u05d1 2) \u05e0\u05db\u05d5\u05e0\u05d5\u05ea:</span> <span class="stat-val" style="color:#b45309;">' + ts.openCorrect + '</span></div>';
-      html += '<div class="stat-row" style="color:#d97706; font-weight:bold;"><span>\u05e9\u05d0\u05dc\u05d5\u05ea \u05e4\u05ea\u05d5\u05d7\u05d5\u05ea (\u05e9\u05dc\u05d1 2) \u05e9\u05d2\u05d5\u05d9\u05d5\u05ea:</span> <span class="stat-val" style="color:#b45309;">' + ts.openWrong + '</span></div>';
-      html += '<hr style="border:1px solid #e2e8f0; margin:15px 0;">';
+      var html = '';
+      html += '<div class="stat-row"><span>מבחני שלב 1 שעברת (90%+):</span> <span class="stat-val">' + ts.examsPassed + ' / 3</span></div>';
+      html += '<div class="stat-row"><span>שלב 2 – תשובות נכונות:</span> <span class="stat-val" style="color:#d97706;">' + ts.openCorrect + '</span></div>';
+      html += '<div class="stat-row"><span>שלב 2 – תשובות שגויות:</span> <span class="stat-val" style="color:#d97706;">' + ts.openWrong + '</span></div>';
+      html += '<div class="stat-row"><span>שלב 3 – תשובות נכונות:</span> <span class="stat-val" style="color:#7c3aed;">' + ts.stage3Correct + '</span></div>';
+      html += '<div class="stat-row"><span>שלב 3 – תשובות שגויות:</span> <span class="stat-val" style="color:#7c3aed;">' + ts.stage3Wrong + '</span></div>';
+      html += '<div class="stat-row"><span>סימולציות שהושלמו:</span> <span class="stat-val" style="color:#dc2626;">' + ts.simCompleted.length + ' / 3</span></div>';
+      html += '<hr style="border:1px solid #e2e8f0; margin:8px 0;">';
       [1, 2, 3, 4].forEach(function (t) {
         var tQ = QUESTIONS.filter(function (q) { return q.topicId == t; });
         var tS = tQ.filter(function (q) { return successes.has(q.id); }).length;
         var pct = Math.round((tS / tQ.length) * 100);
-        html += '<div class="stat-row"><span>\u05e0\u05d5\u05e9\u05d0 ' + t + ' \u05d4\u05d5\u05e9\u05dc\u05dd:</span> <span class="stat-val">' + pct + '% (' + tS + '/' + tQ.length + ')</span></div>';
+        html += '<div class="stat-row"><span>נושא ' + t + ' הושלם:</span> <span class="stat-val">' + pct + '% (' + tS + '/' + tQ.length + ')</span></div>';
       });
       document.getElementById("statsContent").innerHTML = html;
       openModal("statsModal");
     }
 
+    // ─── MEMORY GAME ───
+    var memFirst = null, memSecond = null, memLock = false, memMatched = 0, memTotal = 0;
+
+    function openMemoryGame() { openModal("memoryModal"); startNewMemoryRound(); }
+
+    function startNewMemoryRound() {
+      memFirst = null; memSecond = null; memLock = false; memMatched = 0;
+      var shuffled = shuffleArray(MEMORY_PAIRS).slice(0, 6);
+      memTotal = shuffled.length;
+      var cards = [];
+      shuffled.forEach(function (p) {
+        cards.push({ text: p.term, pair: p.term, type: "term" });
+        cards.push({ text: p.definition, pair: p.term, type: "def" });
+      });
+      cards = shuffleArray(cards);
+      var grid = document.getElementById("memoryGrid");
+      grid.innerHTML = "";
+      cards.forEach(function (c, i) {
+        var div = document.createElement("div");
+        div.className = "mem-card";
+        div.dataset.pair = c.pair;
+        div.dataset.idx = i;
+        div.innerText = "?";
+        div.onclick = function () { flipMemCard(div, c.text); };
+        grid.appendChild(div);
+      });
+      document.getElementById("memoryScore").textContent = "התאמות: 0 / " + memTotal;
+    }
+
+    function flipMemCard(card, text) {
+      if (memLock || card.classList.contains("matched") || card.classList.contains("flipped")) return;
+      card.classList.add("flipped"); card.innerText = text;
+      if (!memFirst) { memFirst = card; return; }
+      memSecond = card; memLock = true;
+
+      if (memFirst.dataset.pair === memSecond.dataset.pair && memFirst.dataset.idx !== memSecond.dataset.idx) {
+        memFirst.classList.add("matched"); memSecond.classList.add("matched");
+        memMatched++;
+        document.getElementById("memoryScore").textContent = "התאמות: " + memMatched + " / " + memTotal;
+        playCorrect(); resetMem();
+        if (memMatched === memTotal) {
+          setTimeout(function () { document.getElementById("memoryScore").textContent = "כל הכבוד! מצאת את כל ההתאמות!"; }, 300);
+        }
+      } else {
+        playWrong();
+        setTimeout(function () {
+          memFirst.classList.remove("flipped"); memSecond.classList.remove("flipped");
+          memFirst.innerText = "?"; memSecond.innerText = "?";
+          resetMem();
+        }, 800);
+      }
+    }
+    function resetMem() { memFirst = null; memSecond = null; memLock = false; }
+
+    // ─── INIT ───
     window.onload = function () {
-      updateStage2UnlockUI();
-      startAll(false);
+      buildGlossary();
+      currentStage = 1;
+      updateRoadmap();
+      // Show welcome screen instead of starting questions
+      document.getElementById("questionText").textContent = "";
+      document.getElementById("topicSubtitle").textContent = "";
+      document.getElementById("helpBtn").style.display = "none";
+      document.getElementById("answersArea").innerHTML =
+        '<div style="text-align:center; padding:30px 10px;">' +
+        '<div style="font-size:22px; font-weight:800; color:#1e293b; margin-bottom:12px;">ברוכים הבאים ללומדת אזרחות</div>' +
+        '<div style="font-size:15px; color:#64748b; line-height:1.6; max-width:400px; margin:0 auto 20px;">' +
+        'בחר שלב מלמעלה או לחץ על אחד הכפתורים כדי להתחיל לתרגל.' +
+        '</div>' +
+        '<div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; font-size:13px; color:#94a3b8;">' +
+        '<span style="background:#f0fdf4; color:#166534; padding:4px 10px; border-radius:6px;">שלב 1: שאלות סגורות</span>' +
+        '<span style="background:#fef3c7; color:#92400e; padding:4px 10px; border-radius:6px;">שלב 2: שאלות פתוחות</span>' +
+        '<span style="background:#ede9fe; color:#5b21b6; padding:4px 10px; border-radius:6px;">שלב 3: תרגול בגרות</span>' +
+        '<span style="background:#fee2e2; color:#991b1b; padding:4px 10px; border-radius:6px;">שלב 4: סימולציות</span>' +
+        '</div>' +
+        '</div>';
+      document.getElementById("qtotal").textContent = "0";
+      document.getElementById("qnum").textContent = "0";
     };
   </script>
 </body>
