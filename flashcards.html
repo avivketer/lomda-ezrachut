@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>כרטיסיות לימוד</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Flashcard Specific CSS */
+    .fc-scene {
+      width: 100%;
+      height: 380px;
+      perspective: 1000px;
+      margin: 20px 0;
+    }
+    .fc-card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+      transform-style: preserve-3d;
+      cursor: pointer;
+    }
+    .fc-card.is-flipped {
+      transform: rotateY(180deg);
+    }
+    .fc-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 20px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
+    }
+    .fc-front {
+      background: linear-gradient(135deg, #fff, #f8fafc);
+      align-items: center;
+      text-align: center;
+    }
+    .fc-back {
+      background: #fdf8f6;
+      transform: rotateY(180deg);
+      border-color: #fdba74;
+    }
+    .fc-topic {
+      font-size: 14px;
+      color: #6366f1;
+      font-weight: 600;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .fc-q {
+      font-size: 24px;
+      font-weight: bold;
+      color: #0f172a;
+      line-height: 1.4;
+    }
+    .fc-def {
+      font-size: 20px;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 12px;
+    }
+    .fc-detail {
+      font-size: 16px;
+      color: #475569;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+    .fc-ex {
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      border-right: 3px solid #3b82f6;
+      font-size: 15px;
+      color: #1e40af;
+      margin-top: auto;
+    }
+    .fc-tipbox {
+      margin-top: 10px;
+      background: #fef3c7;
+      border-right: 3px solid #f59e0b;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #92400e;
+      font-weight: bold;
+    }
+    .fc-controls {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .fc-btn {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #fff;
+      transition: 0.2s;
+    }
+    .fc-know { background: #16a34a; }
+    .fc-dontknow { background: #ef4444; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="topbar" style="margin-bottom: 20px;">
+      <a href="index.html" class="icon-btn" style="background:#f1f5f9; font-weight:bold;">🏠 חזור למסך הראשי</a>
+      <button class="icon-btn" onclick="toggleMute()" id="muteBtn" title="השתקת סאונד">🔊</button>
+      <button class="icon-btn" onclick="openStats()" title="סטטיסטיקה">📊 סטטיסטיקה</button>
+    </div>
+
+    <h1>🎴 כרטיסיות לימוד (מושגים באזרחות)</h1>
+
+    <div class="topbar">
+      <div class="pill gray">למידה והכנה מהירה</div>
+      <div class="pill">ידעתי: <span id="correct">0</span></div>
+      <div class="pill" style="background:#fee2e2;color:#991b1b;">צריך עוד חזרה: <span id="wrong">0</span></div>
+      <div class="pill gray">כרטיס <span id="qnum">1</span> / <span id="qtotal">0</span></div>
+    </div>
+
+    <div class="progress">
+      <div class="progress-inner" id="progressBar" style="background: linear-gradient(90deg, #f59e0b, #ef4444);"></div>
+    </div>
+
+    <!-- Flashcard Area -->
+    <div id="flashcardArea">
+      <div class="fc-scene" onclick="flipFlashcard()">
+        <div class="fc-card" id="flashcardContainer">
+          
+          <!-- Front -->
+          <div class="fc-face fc-front" id="fcFront">
+            <div class="fc-topic" id="fcTopic">נושא</div>
+            <div class="fc-q" id="fcQuestion">השאלה?</div>
+            <div style="margin-top:auto; font-size:14px; color:#94a3b8;">הקלק על הכרטיסייה כדי להפוך ↺</div>
+          </div>
+          
+          <!-- Back -->
+          <div class="fc-face fc-back" id="fcBack">
+            <div class="fc-def" id="fcDef">ההגדרה</div>
+            <div class="fc-detail" id="fcDetail">פירוט</div>
+            <div class="fc-ex" id="fcEx">דוגמה</div>
+            <div class="fc-tipbox" id="fcTipBox" style="display:none;">
+              💡 <span id="fcTip"></span>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+      <div class="fc-controls" id="fcControls" style="display:none;">
+        <button class="fc-btn fc-know" onclick="gradeFlashcard(true, event)">✓ ידעתי את זה</button>
+        <button class="fc-btn fc-dontknow" onclick="gradeFlashcard(false, event)">✗ צריך לחזור על זה</button>
+      </div>
+    </div>
+
+    <!-- Finish msg -->
+    <div id="finishBox" style="display:none; text-align:center; padding: 20px;">
+      <h2 style="color:#d97706;">סיימת את כל המושגים! 🎉</h2>
+      <div id="finishStats" class="small" style="font-size:18px;"></div>
+      <a href="index.html" class="primary" style="display:inline-block; padding:10px 20px; border-radius:8px; text-decoration:none; margin-top:15px;">חזור למסך הראשי</a>
+      <button onclick="startFlashcards()" class="icon-btn" style="display:inline-block; margin-top:15px; margin-right:10px;">תרגל שוב</button>
+    </div>
+
+  </div>
+
+  <!-- Stats Modal -->
+  <div class="modal-overlay" id="statsModal">
+    <div class="modal">
+      <button class="close-modal" aria-label="סגור" onclick="closeModal('statsModal')">&times;</button>
+      <h2>סטטיסטיקת המשתמש</h2>
+      <div id="statsContent"></div>
+      <div style="margin-top: 20px; text-align:center;">
+        <button class="primary" style="padding: 10px 20px; border-radius: 8px; border: none; cursor:pointer;"
+          onclick="closeModal('statsModal')">סגור</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    var list = [];
+    var idx = 0;
+    var correct = 0;
+    var wrong = 0;
+
+    function startFlashcards() {
+      list = shuffleArray(FLASHCARDS.slice());
+      idx = 0; correct = 0; wrong = 0;
+      
+      document.getElementById("flashcardArea").style.display = "block";
+      document.getElementById("finishBox").style.display = "none";
+      document.getElementById("qtotal").textContent = list.length;
+      
+      render();
+    }
+
+    function render() {
+      if (idx >= list.length) {
+        finishSequence();
+        return;
+      }
+      var q = list[idx];
+      document.getElementById("qnum").textContent = (idx + 1);
+      document.getElementById("progressBar").style.width = ((idx / list.length) * 100) + "%";
+      
+      // Update front/back info
+      document.getElementById("fcTopic").textContent = q.topic;
+      document.getElementById("fcQuestion").textContent = q.q;
+      
+      document.getElementById("fcDef").textContent = q.def;
+      document.getElementById("fcDetail").textContent = q.detail;
+      document.getElementById("fcEx").textContent = "דוגמה: " + q.ex;
+      
+      if (q.tip) {
+        document.getElementById("fcTipBox").style.display = "block";
+        document.getElementById("fcTip").textContent = q.tip;
+      } else {
+        document.getElementById("fcTipBox").style.display = "none";
+      }
+      
+      // Reset views instantly
+      var container = document.getElementById("flashcardContainer");
+      container.style.transition = "none";
+      container.classList.remove("is-flipped");
+      document.getElementById("fcControls").style.display = "none";
+      
+      // Restore transition
+      setTimeout(function() {
+        container.style.transition = "transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1)";
+      }, 50);
+    }
+
+    function flipFlashcard() {
+      var container = document.getElementById("flashcardContainer");
+      if (container.classList.contains("is-flipped")) return; // already flipped
+      
+      container.classList.add("is-flipped");
+      
+      // Show controls
+      document.getElementById("fcControls").style.display = "flex";
+    }
+
+    function gradeFlashcard(isKnown, e) {
+      if (e) e.stopPropagation();
+      
+      if (isKnown) {
+        correct++;
+        playCorrect();
+      } else {
+        wrong++;
+        playWrong();
+      }
+      
+      document.getElementById("correct").textContent = correct;
+      document.getElementById("wrong").textContent = wrong;
+      
+      setTimeout(function () { 
+        idx++; 
+        render(); 
+      }, 300);
+    }
+
+    function finishSequence() {
+      document.getElementById("flashcardArea").style.display = "none";
+      document.getElementById("finishBox").style.display = "block";
+      document.getElementById("progressBar").style.width = "100%";
+      document.getElementById("finishStats").innerHTML = '<br>מושגים שידעת: <b>' + correct + '</b><br>מושגים לחזרה: <b>' + wrong + '</b>';
+    }
+
+    window.onload = function () {
+      startFlashcards();
+    };
+  </script>
+</body>
+</html>

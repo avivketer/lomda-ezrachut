@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>שלב 3: סימולציות מלאות</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Specific styles for Open Questions area */
+    #openQuestionArea {
+      margin-top: 10px;
+    }
+    textarea {
+      width: 100%;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 16px;
+      font-family: inherit;
+      border: 2px solid #cbd5e1;
+      resize: vertical;
+    }
+    #sourceTextBox {
+      background:#fffbeb; 
+      border:2px solid #f59e0b; 
+      border-radius:12px; 
+      padding:14px; 
+      margin-bottom:12px; 
+      font-size:15px; 
+      line-height:1.5; 
+      color:#78350f; 
+      white-space:pre-wrap;
+    }
+    .ideal-answer-box {
+      margin-top: 16px;
+      background: #dcfce7;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid #22c55e;
+    }
+    .ideal-title {
+      font-weight: bold;
+      color: #166534;
+      margin-bottom: 8px;
+    }
+    .ideal-text {
+      white-space: pre-wrap;
+      color: #14532d;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="topbar" style="margin-bottom: 20px;">
+      <a href="index.html" class="icon-btn" style="background:#f1f5f9; font-weight:bold;">🏠 חזור למסך הראשי</a>
+      <button class="icon-btn" onclick="toggleMute()" id="muteBtn" title="השתקת סאונד">🔊</button>
+      <button class="icon-btn" onclick="openStats()" title="סטטיסטיקה">📊 סטטיסטיקה</button>
+    </div>
+
+    <h1>שלב 3: סימולציות בגרויות</h1>
+
+    <div class="controls" id="simMenu">
+      <button style="background:#7c3aed !important;color:#fff;" onclick="startSimulation(1)">🎓 סימולציה 1</button>
+      <button style="background:#7c3aed !important;color:#fff;" onclick="startSimulation(2)">🎓 סימולציה 2</button>
+      <button style="background:#7c3aed !important;color:#fff;" onclick="startSimulation(3)">🎓 סימולציה 3</button>
+    </div>
+
+    <div id="simWorkspace" style="display:none;">
+      <div class="topbar">
+        <div class="pill gray" id="simTitle">סימולציה</div>
+        <div class="pill">שאלה <span id="qnum">1</span> / <span id="qtotal">5</span></div>
+      </div>
+
+      <div class="progress">
+        <div class="progress-inner" id="progressBar"></div>
+      </div>
+
+      <div id="questionArea">
+        <div class="topic-subtitle" id="topicSubtitle">נושא</div>
+        
+        <div id="sourceTextBox" style="display:none;"></div>
+        <div id="questionText">חילץ נתונים...</div>
+
+        <div id="openQuestionArea">
+          <textarea id="openAnswerInput" rows="5" placeholder="הקלד/י את תשובתך המלאה כאן..."></textarea>
+          <button id="showAnswerBtn" class="primary" style="width:100%; padding:14px; margin-top:12px; border-radius:12px; font-size:16px; border:none; cursor:pointer;" onclick="showOpenAnswer()">הצג תשובה אידיאלית לבדיקה</button>
+          
+          <div id="idealAnswerBox" class="ideal-answer-box" style="display:none;">
+            <div class="ideal-title">תשובה מעולה:</div>
+            <div id="idealAnswerText" class="ideal-text"></div>
+            
+            <div style="margin-top:16px; text-align:center; font-weight:bold; color:#1e1b4b;">סיימת לקרוא והבנת את התשובה?</div>
+            <button onclick="nextSimQuestion()" style="width:100%; margin-top:10px; background:#4f46e5; color:#fff; border:none; padding:12px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:16px; transition:0.2s;">המשך לשאלה הבאה &raquo;</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Finish message box -->
+      <div id="finishBox" style="display:none; text-align:center; padding: 20px;">
+        <h2 style="color:#16a34a;">סימולציה הושלמה! 🎉</h2>
+        <p>תרגלת בהצלחה עבודה מול שאלות בגרות מורכבות.</p>
+        <a href="stage3-simulations.html" class="primary" style="display:inline-block; padding:10px 20px; border-radius:8px; text-decoration:none; margin-top:15px;">בחר סימולציה נוספת</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Modal -->
+  <div class="modal-overlay" id="statsModal">
+    <div class="modal">
+      <button class="close-modal" aria-label="סגור" onclick="closeModal('statsModal')">&times;</button>
+      <h2>סטטיסטיקת המשתמש</h2>
+      <div id="statsContent"></div>
+      <div style="margin-top: 20px; text-align:center;">
+        <button class="primary" style="padding: 10px 20px; border-radius: 8px; border: none; cursor:pointer;"
+          onclick="closeModal('statsModal')">סגור</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    var currentOpenQ = null;
+    var list = [];
+    var idx = 0;
+
+    function initPage() {
+      if (civics_stats.examsPassed < 3) {
+        alert("שלב 3 חסום! עליך קודם להשלים לפחות 3 מבחנים (שלב 4) בהצלחה מתוך מסך הבית.");
+        window.location.href = "index.html";
+      }
+    }
+
+    function startSimulation(num) {
+      document.getElementById("simMenu").style.display = "none";
+      document.getElementById("simWorkspace").style.display = "block";
+      
+      list = SIMULATIONS[num].slice(); // keep chronological order
+      idx = 0;
+      document.getElementById("simTitle").textContent = "סימולציה " + num + " (30 נק׳ · 20 דק׳)";
+      document.getElementById("qtotal").textContent = list.length;
+      render();
+    }
+
+    function render() {
+      if (idx >= list.length) {
+        finishSequence();
+        return;
+      }
+      
+      currentOpenQ = list[idx];
+      document.getElementById("qnum").textContent = (idx + 1);
+      document.getElementById("progressBar").style.width = ((idx / list.length) * 100) + "%";
+
+      document.getElementById("topicSubtitle").textContent = currentOpenQ.type + " | " + currentOpenQ.points + " נקודות";
+      document.getElementById("questionText").innerHTML = currentOpenQ.question.replace(/\n/g, '<br>');
+      
+      var sourceBox = document.getElementById("sourceTextBox");
+      if (currentOpenQ.source) {
+        sourceBox.style.display = "block";
+        sourceBox.textContent = currentOpenQ.source;
+      } else {
+        sourceBox.style.display = "none";
+      }
+      
+      // Reset Answer Area
+      document.getElementById("openAnswerInput").value = "";
+      document.getElementById("idealAnswerBox").style.display = "none";
+      document.getElementById("showAnswerBtn").style.display = "block";
+    }
+
+    function showOpenAnswer() {
+      if (!currentOpenQ) return;
+      document.getElementById("showAnswerBtn").style.display = "none";
+      document.getElementById("idealAnswerBox").style.display = "block";
+      document.getElementById("idealAnswerText").textContent = currentOpenQ.idealAnswer;
+    }
+
+    function nextSimQuestion() {
+      idx++;
+      render();
+    }
+
+    function finishSequence() {
+      document.getElementById("questionArea").style.display = "none";
+      document.getElementById("progressBar").style.width = "100%";
+      document.getElementById("finishBox").style.display = "block";
+    }
+
+    window.onload = initPage;
+  </script>
+</body>
+</html>

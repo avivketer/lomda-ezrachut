@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>מילון מושגים באזרחות</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .dict-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .filter-bar {
+      background: #fff;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .filter-bar label {
+      font-weight: bold;
+      color: #334155;
+      font-size: 16px;
+    }
+    
+    .filter-bar select {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 16px;
+      background: #f8fafc;
+      color: #0f172a;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    
+    .category-section {
+      margin-bottom: 40px;
+    }
+    
+    .category-title {
+      color: #4f46e5;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #c7d2fe;
+      font-size: 24px;
+    }
+    
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    
+    /* Responsive styles */
+    @media (max-width: 900px) {
+      .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 600px) {
+      .dict-container {
+        padding: 10px;
+      }
+      .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 15px;
+      }
+      .filter-bar label {
+        margin-bottom: 5px;
+      }
+      .cards-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+      .term-card {
+        padding: 20px;
+      }
+    }
+
+    .term-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+      border: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .term-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+    }
+
+    .term-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #0f172a;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .term-def {
+      font-weight: bold;
+      color: #334155;
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+
+    .term-detail {
+      color: #475569;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 15px;
+      flex-grow: 1; /* Pushes example to the bottom if cards are different heights */
+    }
+
+    .term-ex {
+      background: #f8fafc;
+      border-right: 3px solid #3b82f6;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #1e40af;
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dict-container">
+    <div class="topbar" style="margin-bottom: 30px;">
+      <a href="index.html" class="icon-btn" style="background:#fff; font-weight:bold; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">🏠 חזור למסך הראשי</a>
+    </div>
+
+    <h1 style="text-align: center; margin-bottom: 10px;">📖 מילון מושגים לבגרות</h1>
+    <p style="text-align:center; color:#64748b; margin-bottom:30px;">
+      כל המושגים המרכזיים שצריך להכיר למבחן, מסודרים לפי נושאים.
+    </p>
+
+    <div class="filter-bar">
+      <label for="categoryFilter">🔍 בחר נושא למידה:</label>
+      <select id="categoryFilter" onchange="renderDictionary()">
+        <option value="all">הצג את כל המושגים</option>
+        <option value="יסודות הדמוקרטיה">א – יסודות הדמוקרטיה</option>
+        <option value="זכויות וחובות">ב – זכויות וחובות</option>
+        <option value="מוסדות השלטון">ג – מוסדות השלטון</option>
+        <option value="לאומיות ואזרחות">ד – לאומיות ואזרחות</option>
+      </select>
+    </div>
+
+    <!-- Dict content will be dynamically generated here -->
+    <div id="dictContentArea"></div>
+
+  </div>
+
+  <!-- Load Data -->
+  <script src="js/data.js"></script>
+  <script>
+    // Build a structured dictionary out of the FLASHCARDS array
+    function renderDictionary() {
+      const filterValue = document.getElementById("categoryFilter").value;
+      const dictContentArea = document.getElementById("dictContentArea");
+      
+      dictContentArea.innerHTML = ""; // Clear existing
+      
+      // Get unique topics in order
+      const topics = ["יסודות הדמוקרטיה", "זכויות וחובות", "מוסדות השלטון", "לאומיות ואזרחות"];
+      
+      let hasVisibleTopics = false;
+
+      topics.forEach(topic => {
+        // Skip if filtering explicitly and it doesn't match
+        if (filterValue !== "all" && topic !== filterValue) return;
+
+        // Find all cards matching this topic
+        const topicCards = FLASHCARDS.filter(c => c.topic === topic);
+        if (topicCards.length === 0) return;
+        
+        hasVisibleTopics = true;
+
+        // Create section container
+        const section = document.createElement("div");
+        section.className = "category-section";
+
+        // Create Title
+        const title = document.createElement("h2");
+        title.className = "category-title";
+        title.textContent = topic;
+        section.appendChild(title);
+
+        // Create Grid
+        const grid = document.createElement("div");
+        grid.className = "cards-grid";
+
+        // Add Cards
+        topicCards.forEach(card => {
+          const cardEl = document.createElement("div");
+          cardEl.className = "term-card";
+
+          cardEl.innerHTML = `
+            <div class="term-title">${card.q.replace('?', '')}</div>
+            <div class="term-def">${card.def}</div>
+            <div class="term-detail">${card.detail}</div>
+            ${card.ex ? `<div class="term-ex"><b>דוגמה:</b> ${card.ex}</div>` : ''}
+          `;
+          
+          grid.appendChild(cardEl);
+        });
+
+        section.appendChild(grid);
+        dictContentArea.appendChild(section);
+      });
+
+      if (!hasVisibleTopics) {
+        dictContentArea.innerHTML = "<div style='text-align:center; padding: 40px; color: #64748b; font-size: 18px;'>לא נמצאו מושגים עבור הקטגוריה שנבחרה.</div>";
+      }
+    }
+
+    // Initialize on load
+    document.addEventListener("DOMContentLoaded", function() {
+      renderDictionary();
+    });
+  </script>
+</body>
+</html>

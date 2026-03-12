@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>שלב 1: תרגול לומדת אזרחות</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="container">
+    <div class="topbar" style="margin-bottom: 20px;">
+      <a href="index.html" class="icon-btn" style="background:#f1f5f9; font-weight:bold;">🏠 חזור למסך הראשי</a>
+      <button class="icon-btn" onclick="toggleMute()" id="muteBtn" title="השתקת סאונד">🔊</button>
+      <button class="icon-btn" onclick="openStats()" title="סטטיסטיקה">📊 סטטיסטיקה</button>
+    </div>
+
+    <h1>שלב 1: מבחן 200 שאלות</h1>
+
+    <div class="options-bar">
+      <select id="topicFilter" onchange="topicChanged()">
+        <option value="all">כל הנושאים</option>
+        <option value="1">נושא 1: עקרונות יסוד דמוקרטיה</option>
+        <option value="2">נושא 2: זכויות אדם ואזרח</option>
+        <option value="3">נושא 3: מוסדות השלטון</option>
+        <option value="4">נושא 4: לאומיות ומיעוטים</option>
+      </select>
+    </div>
+
+    <div class="topbar">
+      <div class="pill gray" id="modeLabel">הכול</div>
+      <div class="pill">נכון: <span id="correct">0</span></div>
+      <div class="pill" style="background:#fee2e2;color:#991b1b;">שגוי: <span id="wrong">0</span></div>
+      <div class="pill gray">שאלה <span id="qnum">1</span> / <span id="qtotal">0</span></div>
+    </div>
+
+    <div class="progress">
+      <div class="progress-inner" id="progressBar"></div>
+    </div>
+
+    <div class="controls">
+      <button class="primary" onclick="startAll(true)">תרגול אקראי</button>
+      <button class="primary" onclick="startAll(false)" style="background:#6366f1 !important;">תרגול לפי סדר</button>
+      <button class="mistakes-btn" onclick="startMistakes()">חזרה על טעויות</button>
+      <button style="background:#22c55e !important;color:#fff;" onclick="startSuccesses()">חזרה על הצלחות</button>
+    </div>
+
+    <div id="questionArea">
+      <div class="topic-subtitle" id="topicSubtitle"></div>
+      <div class="help-row">
+        <button class="help-btn" id="helpBtn" onclick="toggleHelp()" title="רמז להבנת השאלה">💡</button>
+        <div id="questionText">חילץ נתונים...</div>
+      </div>
+      <div class="help-box" id="helpBox"></div>
+      <div id="answersArea"></div>
+    </div>
+  </div>
+
+  <!-- Stats Modal -->
+  <div class="modal-overlay" id="statsModal">
+    <div class="modal">
+      <button class="close-modal" aria-label="סגור" onclick="closeModal('statsModal')">&times;</button>
+      <h2>סטטיסטיקת המשתמש</h2>
+      <div id="statsContent"></div>
+      <div style="margin-top: 20px; text-align:center;">
+        <button class="primary" style="padding: 10px 20px; border-radius: 8px; border: none; cursor:pointer;"
+          onclick="closeModal('statsModal')">סגור</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="questions.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    var mode = "all";
+    var shuffled = true;
+    var list = [];
+    var idx = 0;
+    var correct = 0;
+    var wrong = 0;
+
+    function setModeLabel(txt) { document.getElementById("modeLabel").textContent = txt; }
+    function topicChanged() { startAll(true); }
+
+    function getTopicLabel() {
+      var topic = document.getElementById("topicFilter").value;
+      if (topic === "all") return "";
+      var opt = document.getElementById("topicFilter").selectedOptions[0];
+      return " (" + opt.textContent.split(":")[0].trim() + ")";
+    }
+
+    function getFilteredBase() {
+      var topic = document.getElementById("topicFilter").value;
+      if (topic === "all") return QUESTIONS;
+      return QUESTIONS.filter(function (q) { return q.topicId == topic; });
+    }
+
+    function initCounters() {
+      document.getElementById("qtotal").textContent = list.length;
+      document.getElementById("correct").textContent = correct;
+      document.getElementById("wrong").textContent = wrong;
+      document.getElementById("answersArea").style.display = "block";
+    }
+
+    function startAll(doShuffle) {
+      mode = "all"; shuffled = doShuffle;
+      var baseQuestions = getFilteredBase();
+      list = doShuffle ? shuffleArray(baseQuestions) : baseQuestions.slice();
+      idx = 0; correct = 0; wrong = 0;
+      setModeLabel((doShuffle ? "תרגול אקראי" : "תרגול לפי סדר") + getTopicLabel());
+      initCounters();
+      render();
+    }
+
+    function startMistakes() {
+      mode = "mistakes"; shuffled = true;
+      var base = getFilteredBase();
+      var arr = base.filter(function (q) { return mistakes.has(q.id); });
+      if (!arr.length) { alert("אין טעויות שמורות" + (getTopicLabel() ? " בנושא זה" : "") + "."); return; }
+      list = shuffleArray(arr);
+      idx = 0; correct = 0; wrong = 0;
+      setModeLabel("חזרת טעויות" + getTopicLabel());
+      initCounters();
+      render();
+    }
+
+    function startSuccesses() {
+      mode = "successes"; shuffled = true;
+      var base = getFilteredBase();
+      var arr = base.filter(function (q) { return successes.has(q.id); });
+      if (!arr.length) { alert("אין הצלחות שמורות" + (getTopicLabel() ? " בנושא זה" : "") + "."); return; }
+      list = shuffleArray(arr);
+      idx = 0; correct = 0; wrong = 0;
+      setModeLabel("חזרת הצלחות" + getTopicLabel());
+      initCounters();
+      render();
+    }
+
+    function render() {
+      if (idx >= list.length) {
+        finishSequence();
+        return;
+      }
+      var q = list[idx];
+      document.getElementById("qnum").textContent = (idx + 1);
+      document.getElementById("progressBar").style.width = ((idx / list.length) * 100) + "%";
+
+      document.getElementById("questionText").textContent = q.question;
+      document.getElementById("topicSubtitle").textContent = q.topic || "";
+      
+      var helpBox = document.getElementById("helpBox");
+      var helpBtn = document.getElementById("helpBtn");
+      helpBox.style.display = "none";
+      helpBox.textContent = q.explanation || "";
+      helpBtn.style.display = q.explanation ? "flex" : "none";
+
+      var answersArea = document.getElementById("answersArea");
+      answersArea.innerHTML = "";
+      var built = q.answers.map(function (t, i) { return { text: t, isCorrect: i === q.correctIndex }; });
+      var shown = shuffleArray(built);
+      shown.forEach(function (opt, vIdx) {
+        var btn = document.createElement("button");
+        btn.className = "answer-btn";
+        btn.innerHTML = "<span>" + String.fromCharCode(1488 + vIdx) + ". " + opt.text + "</span><span></span>";
+        btn.onclick = function () { choose(btn, opt.isCorrect, shown, q); };
+        answersArea.appendChild(btn);
+      });
+    }
+
+    function choose(btn, isCorrect, shown, q) {
+      var buttons = Array.from(document.querySelectorAll(".answer-btn"));
+      if (buttons.some(function (b) { return b.classList.contains("correct") || b.classList.contains("wrong"); })) return;
+
+      if (isCorrect) {
+        btn.classList.add("correct");
+        correct++;
+        successes.add(q.id);
+        mistakes.delete(q.id);
+        playCorrect();
+      } else {
+        btn.classList.add("wrong");
+        wrong++;
+        mistakes.add(q.id);
+        playWrong();
+        buttons.forEach(function (b, i) {
+          if (shown[i].isCorrect) b.classList.add("correct");
+        });
+      }
+      saveSets();
+      document.getElementById("correct").textContent = correct;
+      document.getElementById("wrong").textContent = wrong;
+      setTimeout(function () { idx++; render(); }, 1200);
+    }
+
+    function finishSequence() {
+      var MathMax = Math.max(1, list.length);
+      var percent = Math.round((correct / MathMax) * 100);
+      document.getElementById("questionText").innerHTML = "סיום תרגול 🎉";
+      document.getElementById("progressBar").style.width = "100%";
+      document.getElementById("helpBox").style.display = "none";
+      document.getElementById("helpBtn").style.display = "none";
+
+      document.getElementById("answersArea").innerHTML = '<div class="small" style="text-align:center; font-size:18px;">ציון: <b>' + percent + '%</b> <br><br> נכון: ' + correct + ' מתוך ' + list.length + '</div>';
+    }
+
+    window.onload = function () {
+      startAll(true);
+    };
+  </script>
+</body>
+</html>
